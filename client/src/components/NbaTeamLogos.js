@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box } from '@mui/material';
 import * as NBAIcons from 'react-nba-logos';
 
 const logos = {
@@ -35,24 +35,80 @@ const logos = {
   'WAS': NBAIcons.WAS,
 };
 
-const NbaTeamLogos = ({ teams }) => {
-  const filteredTeams = teams.filter((team) => logos[team.team_id]);
 
-  return (
-    <Container maxWidth="md">
-      <Box display="flex" flexWrap="wrap" justifyContent="center">
-        {filteredTeams.map((team, index) => {
-          const LogoComponent = logos[team.team_id];
-          return (
-            <Box m={2} p={2} key={index}>
-              <h2>{team.fran_id}</h2>
-              {LogoComponent && <LogoComponent />}
-            </Box>
-          );
-        })}
-      </Box>
-    </Container>
-  );
+export function NbaTeamLogos ({ teams, seasons }) {
+
+  const filteredTeams = teams.filter((team) => logos[team.team_id]);
+  if(seasons) {
+    const seasonString = `season(s): ${seasons[0]}-${seasons[1]}`;
+    return (
+      <Container maxWidth="sm" sx={{
+        padding: 10
+      }}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Teams from {seasonString}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredTeams.map((team, index) => {
+                const LogoComponent = logos[team.team_id];
+                return (
+                  <TableRow hover key={index} sx={{
+                  padding: 100
+                }}>
+                    <TableCell>
+                      {team.fran_id}                     
+                      <Box>
+                        {LogoComponent && <LogoComponent />}
+                      </Box>
+                    </TableCell>
+  
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Container>
+    )
+  } else {
+    return (
+      <Container maxWidth="sm" sx={{
+        padding: 10
+      }}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Teams</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredTeams.map((team, index) => {
+                const LogoComponent = logos[team.team_id];
+                return (
+                  <TableRow hover key={index} sx={{
+                  padding: 100
+                }}>
+                    <TableCell>
+                      {team.fran_id}                     
+                      <Box>
+                        {LogoComponent && <LogoComponent />}
+                      </Box>
+                    </TableCell>
+  
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Container>
+    );
+  }
 };
 
 export default NbaTeamLogos;
