@@ -1,0 +1,9 @@
+{
+  "rds_host": "nba-database-app.cvsku4g5ru44.us-east-1.rds.amazonaws.com",
+  "rds_port": "3306",
+  "rds_user": "admin",
+  "rds_password": "%gkRR97t",
+  "rds_db": "nba-app",
+  "server_host": "localhost",
+  "server_port": "8080"
+}
