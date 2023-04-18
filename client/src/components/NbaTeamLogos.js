@@ -40,7 +40,7 @@ export function NbaTeamLogos ({ teams, seasons }) {
 
   const filteredTeams = teams.filter((team) => logos[team.team_id]);
   if(seasons) {
-    const seasonString = `season(s): ${seasons[0]}-${seasons[1]}`;
+    const seasonString = `Season: ${seasons}`;
     return (
       <Container maxWidth="sm" sx={{
         padding: 10

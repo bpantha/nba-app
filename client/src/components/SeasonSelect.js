@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Slider } from '@mui/material';
 
 function valueText(value) {
   return `${value}`;
 }
 
-export function SeasonSelect ({ onSeasonsChange }) {
-  const [value, setValue] = useState([2022, 2022]);
+export function SeasonSelect ({ onSeasonsChange, value, setValue }) {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -18,7 +17,7 @@ export function SeasonSelect ({ onSeasonsChange }) {
       <Typography gutterBottom>Years Range</Typography>
       <Box sx={{ width: '100%' }}>
         <Slider
-          getAriaLabel={() => 'Years range'}
+          getAriaLabel={() => 'Year'}
           value={value}
           onChange={handleChange}
           valueLabelDisplay="auto"
