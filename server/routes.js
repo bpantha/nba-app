@@ -57,16 +57,13 @@ const player = async function(req, res) {
 // Route 3: GET /teams/:season
 const teams = async function(req, res) {
   const seasonsParam = req.params.season;
-  const [startYear, endYear] = seasonsParam.replace(/[()]/g, "").split(",");
 
-  
   // Split the comma-separated list of seasons if provided, otherwise use the latest season
   const seasonsCondition = seasonsParam
-  ? `s.season BETWEEN ${startYear} AND ${endYear}`
+  ? `s.season = ${seasonsParam}`
   : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
   
-  console.log(seasonsCondition);
   const query = `
   SELECT DISTINCT t.team_id, t.fran_id
   FROM Teams t
