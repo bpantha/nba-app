@@ -17,7 +17,7 @@ app.get('/best_players/', routes.best_players);
 app.get('/best_seasons_bad_teams/', routes.best_seasons_bad_teams);
 app.get('/game/:game_id', routes.game);
 app.get('/upsets', routes.upsets);
-app.get('/award', routes.award);
+app.get('/award/:season?', routes.award);
 app.get('/awards_by_team', routes.awards_by_team);
 app.get('/draft/good',routes.draft_good);
 app.get('/draft/bad',routes.draft_bad);
