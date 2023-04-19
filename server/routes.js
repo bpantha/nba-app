@@ -218,12 +218,15 @@ const upsets = async function(req, res) {
 
 // Route 12: GET /award
 const award = async function(req, res) {
-  // const award = req.query.award;
-  // const season = req.query.season;
   const seasonsParam = req.params.season;
+  let allSeasonsToggle = false;
+  if (seasonsParam.length > 4) {
+    allSeasonsToggle = true;
+  }
 
-  // Split the comma-separated list of seasons if provided, otherwise use the latest season
-  const seasonsCondition = seasonsParam
+  const seasonsCondition = allSeasonsToggle 
+  ? 'TRUE'
+  : seasonsParam
   ? `a.season = ${seasonsParam}`
   : `a.season = (SELECT MAX(season) FROM Seasons)`;
 

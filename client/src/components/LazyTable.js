@@ -6,8 +6,9 @@ import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
 // LazyTable is paginated and takes in data prop which is a json object and maps keys to columns and values to row
 
 export function LazyTable({
-   data, 
-   defaultPageSize = 5, 
+   data,
+   seasons,
+   defaultPageSize = 10, 
    pageSizeOptions = [5, 10, 25, 50] }) {
   
   // get the keys and store in columns array
@@ -20,10 +21,10 @@ export function LazyTable({
   const handleChangePage = (e, newPage) => {
     // Can always go to previous page (TablePagination prevents negative pages)
     // but only fetch next page if we haven't reached the end (currently have full page of data)
-    if (newPage < page || data.length === pageSize) {
+    // if (newPage < page || data.length === pageSize) {
       // Note that we set newPage + 1 since we store as 1 indexed but the default pagination gives newPage as 0 indexed
-      setPage(newPage + 1);
-    }
+      setPage(newPage);
+    // }
   };
 
   const handleChangePageSize = (e) => {
@@ -32,6 +33,8 @@ export function LazyTable({
     setPage(0);
   };
 
+  if(seasons) {
+    const seasonString = `Season: ${seasons}`;
   return (
     <TableContainer component={Paper}>
         <Table>
@@ -67,6 +70,8 @@ export function LazyTable({
       />
     </TableContainer>
   );
+}
+
 }
 
 export default LazyTable;
