@@ -23,6 +23,7 @@ app.get('/draft/good',routes.draft_good);
 app.get('/draft/bad',routes.draft_bad);
 app.get('/teamwork',routes.teamwork);
 app.get('/teams/:season?',routes.teams);
+app.get('/roster', routes.roster);
 
 app.listen(config.server_port, () => {
   console.log(`Server running at http://${config.server_host}:${config.server_port}/`)

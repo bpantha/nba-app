@@ -99,6 +99,28 @@ const player_stats = async function(req, res) {
   }); // replace this with your implementation
 }
 
+// Route 6: GET /roster
+const roster = async function(req, res) {
+  const team = req.query.team;
+  const season = req.query.season;
+
+  connection.query(`
+  WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
+  FROM Seasons s 
+  WHERE s.team = '${team}' AND s.season = ${season} AND s.season_type = 'RS')
+  SELECT p.player_name, r.gp, r.mp, r.pts, r.reb, r.ast, p.player_height, p.player_weight, p.country, p.college
+  FROM Players p NATURAL JOIN Roster r
+  ORDER BY r.mp DESC`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  }); 
+}
+
+
 // Route 5: GET /best_players
 const best_players = async function(req, res) {
   const season = req.query.season;
@@ -516,6 +538,7 @@ module.exports = {
   draft_good,
   draft_bad,
   teamwork,
-  teams
+  teams,
+  roster
 }
 
