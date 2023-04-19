@@ -102,12 +102,62 @@ const player_stats = async function(req, res) {
 // Route 6: GET /roster
 const roster = async function(req, res) {
   const team = req.query.team;
-  const season = req.query.season;
+  const seasonsParam = req.query.season;
+  const seasonsCondition = req.query.allSeasonsToggle 
+  ? 'TRUE'
+  : seasonsParam
+  ? `s.season = ${seasonsParam}`
+  : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
+  const page = req.query.page;
+  
+  const pageSize = (req.query.page_size ?? 10);
+
+  if (seasonsCondition == 'TRUE') {
+    if (!page) {
+    connection.query(`
+    WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
+    FROM Seasons s 
+    WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
+    Career AS (SELECT p.player_id, SUM(r.gp) as gp, SUM(r.mp) as mp, AVG(r.pts) as pts, AVG(r.reb) as reb, AVG(r.ast) as ast
+    FROM Players p NATURAL JOIN Roster r
+    GROUP BY p.player_id)
+    SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
+    FROM Career c JOIN Players p on c.player_id = p.player_id
+    ORDER BY c.mp DESC`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });} else {
+    const offset = pageSize*(page-1);
+    if (page===0) {offset = 0;}
+    connection.query(`
+    WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
+      FROM Seasons s 
+      WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
+      Career AS (SELECT p.player_id, SUM(r.gp) as gp, SUM(r.mp) as mp, AVG(r.pts) as pts, AVG(r.reb) as reb, AVG(r.ast) as ast
+      FROM Players p NATURAL JOIN Roster r
+      GROUP BY p.player_id)
+      SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
+      FROM Career c JOIN Players p on c.player_id = p.player_id
+      ORDER BY c.mp DESC
+      LIMIT ${pageSize} OFFSET ${offset}`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
+  }
+  } else {
   connection.query(`
   WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
   FROM Seasons s 
-  WHERE s.team = '${team}' AND s.season = ${season} AND s.season_type = 'RS')
+  WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS')
   SELECT p.player_name, r.gp, r.mp, r.pts, r.reb, r.ast, p.player_height, p.player_weight, p.country, p.college
   FROM Players p NATURAL JOIN Roster r
   ORDER BY r.mp DESC`, (err, data) => {
@@ -117,7 +167,8 @@ const roster = async function(req, res) {
     } else {
       res.json(data);
     }
-  }); 
+  });}
+
 }
 
 
