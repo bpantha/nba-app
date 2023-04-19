@@ -38,9 +38,19 @@ const Player = () => {
       fetchData();
     }, [])
 
+    const h1Style = {
+        marginRight: "30px",
+        fontFamily: "monospace",
+        fontWeight: 700,
+        letterSpacing: ".3rem",
+        textAlign: 'center',
+        color: '#2E4A62'
+    }
+
   return(
     <div>
       <SeasonSelect onSeasonsChange={handleSeasonsChange} value={seasons} setValue={setSeasons} />
+      <h1 style={h1Style}>Award Winners</h1>
       <LazyTable data={awardWinners}/>
     </div>
     
