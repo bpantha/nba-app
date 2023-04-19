@@ -57,18 +57,23 @@ const player = async function(req, res) {
 // Route 3: GET /teams/:season
 const teams = async function(req, res) {
   const seasonsParam = req.params.season;
+  let allSeasonsToggle = false;
+  if (seasonsParam.length > 4) {
+    allSeasonsToggle = true;
+  }
 
-  // Split the comma-separated list of seasons if provided, otherwise use the latest season
-  const seasonsCondition = seasonsParam
+  const seasonsCondition = allSeasonsToggle 
+  ? 'TRUE'
+  : seasonsParam
   ? `s.season = ${seasonsParam}`
   : `s.season = (SELECT MAX(season) FROM Seasons)`;
-
   
   const query = `
   SELECT DISTINCT t.team_id, t.fran_id
   FROM Teams t
   JOIN Seasons s ON t.team_id = s.team
-  WHERE ${seasonsCondition}`;
+  WHERE ${seasonsCondition}
+  ORDER BY t.fran_id`;
 
   connection.query(query, (err, data) => {
     if (err || data.length === 0) {
