@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { NbaTeamLogos } from '../components/NbaTeamLogos';
 import { SeasonSelect } from '../components/SeasonSelect';
+import { LazyTable } from '../components/LazyTable';
 import { debounce } from 'lodash';
 const config = require("../config.json");  
 
-const Home = () => {
-  const [teams, setTeams] = useState([]);
+const Player = () => {
+  const [awardWinners, setAwardWinners] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
 
   //linter warning, not a big deal
@@ -15,32 +15,46 @@ const Home = () => {
       setSeasons(newSelectedSeason);
 
       const fetchData = async() => {
-        fetch(`http://${config.server_host}:${config.server_port}/teams/${seasons}`)
+        fetch(`http://${config.server_host}:${config.server_port}/award/${seasons}`)
         .then((res) => res.json())
-        .then((resJson) => setTeams(resJson));
+        .then((resJson) => setAwardWinners(resJson));
       }
       fetchData();
     }, 50),
     [seasons]
   );
+
+  // console.log(awardWinners);
+
+  
+
   //useEffect with empty dependency array gets the API call to run initially
     useEffect(() => {
       const fetchData = async() => {
-        fetch(`http://${config.server_host}:${config.server_port}/teams/${seasons}`)
+        fetch(`http://${config.server_host}:${config.server_port}/award/${seasons}`)
         .then((res) => res.json())
-        .then((resJson) => setTeams(resJson));
+        .then((resJson) => setAwardWinners(resJson));
       }
       fetchData();
     }, [])
-  
+
+    const h1Style = {
+        marginRight: "30px",
+        fontFamily: "monospace",
+        fontWeight: 700,
+        letterSpacing: ".3rem",
+        textAlign: 'center',
+        color: '#2E4A62'
+    }
+
   return(
     <div>
       <SeasonSelect onSeasonsChange={handleSeasonsChange} value={seasons} setValue={setSeasons} />
-      <NbaTeamLogos teams={teams} seasons={seasons} />;
-
+      <h1 style={h1Style}>Award Winners</h1>
+      <LazyTable data={awardWinners}/>
     </div>
     
   ) 
 };
 
-  export default Home;
+export default Player;

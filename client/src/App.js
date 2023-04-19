@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { indigo, amber } from "@mui/material/colors";
+import { indigo, amber, red, blue } from "@mui/material/colors";
 import { createTheme } from "@mui/material/styles";
 import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
+import Player from "./pages/Player";
 // import HomePage from "./pages/HomePage";
 // import AlbumsPage from "./pages/AlbumsPage";
 // import SongsPage from "./pages/SongsPage";
@@ -30,6 +31,7 @@ export default function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/player" element={<Player />} />
           {/* <Route path="/teams" element={<AlbumsPage />} /> */}
           {/* <Route path="/albums/:album_id" element={<AlbumInfoPage />} /> */}
           {/* <Route path="/songs" element={<SongsPage />} /> */}

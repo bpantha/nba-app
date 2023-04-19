@@ -213,21 +213,28 @@ const upsets = async function(req, res) {
 
 // Route 12: GET /award
 const award = async function(req, res) {
-  const award = req.query.award;
-  const season = req.query.season;
+  // const award = req.query.award;
+  // const season = req.query.season;
+  const seasonsParam = req.params.season;
 
-  connection.query(`
-  SELECT a.season, a.award, p.player_name, s.team, s.raptor_total, s.raptor_offense, s.raptor_defense
+  // Split the comma-separated list of seasons if provided, otherwise use the latest season
+  const seasonsCondition = seasonsParam
+  ? `a.season = ${seasonsParam}`
+  : `a.season = (SELECT MAX(season) FROM Seasons)`;
+
+  query = `
+  SELECT DISTINCT a.season, a.award, p.player_name, s.team
   FROM Awards a JOIN Players p on p.player_id = a.player_id JOIN Seasons s on s.player_id=p.player_id and s.season=a.season
-  WHERE a.award = '${award}' and a.season = ${season}
-  LIMIT 1`, (err, data) => {
+  WHERE ${seasonsCondition}`
+  
+  connection.query(query, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
       res.json({});
     } else {
-      res.json(data[0]);
+      res.json(data);
     }
-  }); // replace this with your implementation
+  });
 }
 
 
