@@ -8,7 +8,7 @@ import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
 export function LazyTable({
    data,
    seasons,
-   defaultPageSize = 10, 
+   defaultPageSize = 5, 
    pageSizeOptions = [5, 10, 25, 50] }) {
   
   // get the keys and store in columns array

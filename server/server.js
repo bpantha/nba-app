@@ -13,7 +13,7 @@ app.use(cors({
 app.get('/authors/:type', routes.authors);
 app.get('/player/:player_id', routes.player);
 app.get('/player_stats/:player_id', routes.player_stats);
-app.get('/best_players/', routes.best_players);
+app.get('/best_players/:season?', routes.best_players);
 app.get('/best_seasons_bad_teams/', routes.best_seasons_bad_teams);
 app.get('/game/:game_id', routes.game);
 app.get('/upsets', routes.upsets);

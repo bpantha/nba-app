@@ -6,10 +6,9 @@ const config = require("../config.json");
 
 const Player = () => {
   const [awardWinners, setAwardWinners] = useState([]);
+  const [bestPlayers, setBestPlayers] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
 
-  //linter warning, not a big deal
-  //use debounce function to buffer the http requests from the slider
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
       setSeasons(newSelectedSeason);
@@ -20,14 +19,15 @@ const Player = () => {
         .then((resJson) => setAwardWinners(resJson));
       }
       fetchData();
+      const fetchData2 = async() => {
+        fetch(`http://${config.server_host}:${config.server_port}/best_players/${seasons}`)
+        .then((res) => res.json())
+        .then((resJson) => setBestPlayers(resJson));
+      }
+      fetchData2();
     }, 50),
     [seasons]
   );
-
-  // console.log(awardWinners);
-
-  
-
   //useEffect with empty dependency array gets the API call to run initially
     useEffect(() => {
       const fetchData = async() => {
@@ -38,6 +38,16 @@ const Player = () => {
       fetchData();
     }, [])
 
+    useEffect(() => {
+      const fetchData2 = async() => {
+        fetch(`http://${config.server_host}:${config.server_port}/best_players/${seasons}`)
+        .then((res) => res.json())
+        .then((resJson) => setBestPlayers(resJson));
+      }
+      fetchData2();
+    }, [])
+
+
     const h1Style = {
         marginRight: "30px",
         fontFamily: "monospace",
@@ -47,13 +57,14 @@ const Player = () => {
         color: '#2E4A62'
     }
   
-    console.log(awardWinners);
-
   return(
     <div>
       <SeasonSelect onSeasonsChange={handleSeasonsChange} value={seasons} setValue={setSeasons} />
-      <h1 style={h1Style}>Award Winners</h1>
+      <h1 style={h1Style}>Award Winners in {seasons}</h1>
       <LazyTable data={awardWinners} seasons={seasons}/>
+      <h1 style={h1Style}>Best Players {seasons}</h1>
+      <LazyTable data={bestPlayers} seasons={seasons}/>
+
     </div>
     
   ) 
