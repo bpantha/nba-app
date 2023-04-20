@@ -122,7 +122,7 @@ const best_players = async function(req, res) {
   : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
   connection.query(`
-    SELECT p.player_name, s.team, s.season, s.raptor_total, s.raptor_offense, s.raptor_defense
+    SELECT p.player_name, s.team, s.season, s.war_total, s.raptor_offense, s.raptor_defense
     FROM Seasons s join Players p on s.player_id = p.player_id
     WHERE ${seasonsCondition} and s.gp > 40 and s.season_type = 'RS'
     ORDER BY s.raptor_total DESC`, (err, data) => {
