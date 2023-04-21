@@ -12,7 +12,7 @@ app.use(cors({
 // provide their handlers that we implemented in routes.js
 app.get('/authors/:type', routes.authors);
 app.get('/player/:player_id', routes.player);
-app.get("/roster/:team_id/:season", routes.player_stats);
+app.get("/roster/:team/:season", routes.roster);
 app.get("/player_stats/:player_name/:season", routes.player_stats);
 app.get('/best_players/', routes.best_players);
 app.get('/best_seasons_bad_teams/', routes.best_seasons_bad_teams);
