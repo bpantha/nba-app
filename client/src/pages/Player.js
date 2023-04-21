@@ -28,7 +28,7 @@ const Player = () => {
 
       const fetchData = async () => {
         fetch(
-          `http://${config.server_host}:${config.server_port}/award/${seasons}`
+          `http://${config.server_host}:${config.server_port}/award/${newSelectedSeason}`
         )
           .then((res) => res.json())
           .then((resJson) => setAwardWinners(resJson));
@@ -36,7 +36,7 @@ const Player = () => {
       fetchData();
       const fetchData2 = async () => {
         fetch(
-          `http://${config.server_host}:${config.server_port}/best_players/${seasons}`
+          `http://${config.server_host}:${config.server_port}/best_players/${newSelectedSeason}`
         )
           .then((res) => res.json())
           .then((resJson) => setBestPlayers(resJson));
@@ -112,7 +112,6 @@ const Player = () => {
       ],
     },
   };
-
   return (
     <div>
       <SeasonSelect
