@@ -101,13 +101,18 @@ const player_stats = async function(req, res) {
 
 // Route 6: GET /roster
 const roster = async function(req, res) {
-  const team = req.query.team;
-  const seasonsParam = req.query.season;
-  const seasonsCondition = req.query.allSeasonsToggle 
-  ? 'TRUE'
-  : seasonsParam
-  ? `s.season = ${seasonsParam}`
-  : `s.season = (SELECT MAX(season) FROM Seasons)`;
+  const team = req.params.team;
+  const seasonsParam = req.params.season;
+  let allSeasonsToggle = false;
+  if (seasonsParam.length > 4) {
+    allSeasonsToggle = true;
+  }
+
+  const seasonsCondition = allSeasonsToggle
+    ? "TRUE"
+    : seasonsParam
+    ? `s.season = ${seasonsParam}`
+    : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
   const page = req.query.page;
   
