@@ -10,7 +10,7 @@ export function PlayerCard({ player }) {
   const [open, setOpen] = useState(false);
   const [playerStats, setPlayerStats] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
-
+  console.log(seasons);
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
       setSeasons(newSelectedSeason);
@@ -80,7 +80,7 @@ export function PlayerCard({ player }) {
                 value={seasons}
                 setValue={setSeasons}
               />
-              <LazyTable data={playerStats} season={seasons} />
+              <LazyTable data={playerStats} seasons={"TRUE"} />
               <Button
                 onClick={handleClose}
                 style={{ left: "50%", transform: "translateX(-50%)" }}
