@@ -1,5 +1,6 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { PlayerCard } from "./PlayerCard";
 import {
   Table,
   TableBody,
@@ -30,15 +31,14 @@ export function LazyTable({
   const columns = data?.[0] ? Object.keys(data[0]) : [];
 
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(defaultPageSize ?? 10);
+  const [pageSize, setPageSize] = useState(defaultPageSize ?? 5);
+
+  useEffect(() => {
+    setPage(0);
+  }, [data]);
 
   const handleChangePage = (e, newPage) => {
-    // Can always go to previous page (TablePagination prevents negative pages)
-    // but only fetch next page if we haven't reached the end (currently have full page of data)
-    // if (newPage < page || data.length === pageSize) {
-    // Note that we set newPage + 1 since we store as 1 indexed but the default pagination gives newPage as 0 indexed
     setPage(newPage);
-    // }
   };
 
   const handleChangePageSize = (e) => {
@@ -127,6 +127,12 @@ export function LazyTable({
                             key={column}
                             value={row[column]}
                           />
+                        );
+                      } else if (column === "player_name") {
+                        return (
+                          <TableCell key={column}>
+                            <PlayerCard player={row[column]} />
+                          </TableCell>
                         );
                       } else {
                         return (
