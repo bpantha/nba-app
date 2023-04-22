@@ -10,6 +10,7 @@ export function PlayerCard({ player }) {
   const [open, setOpen] = useState(false);
   const [playerStats, setPlayerStats] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
+
   console.log(seasons);
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
@@ -35,9 +36,9 @@ export function PlayerCard({ player }) {
       .then((resJson) => {
         setPlayerStats(resJson);
       });
-  }, [seasons]);
+  }, []);
 
-  console.log(playerStats);
+  // console.log(playerStats);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -45,6 +46,11 @@ export function PlayerCard({ player }) {
 
   const handleClose = () => {
     setOpen(false);
+    setSeasons([2022]);
+  };
+
+  const handleNoSeason = () => {
+    setSeasons([2022]);
   };
 
   if (playerStats.length === 0) {
@@ -52,100 +58,100 @@ export function PlayerCard({ player }) {
   }
 
   // if all seasons is toggled, show tabulated stats
-  if (seasons) {
-    if (seasons === "All Seasons") {
-      return (
-        <>
-          <Button onClick={handleClickOpen}>{player}</Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
+  if (seasons === "All Seasons") {
+    return (
+      <>
+        <Button onClick={handleClickOpen}>{player}</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            p={3}
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              background: "white",
+              borderRadius: "16px",
+              border: "2px solid #000",
+              width: 600,
             }}
           >
-            <Box
-              p={3}
-              style={{
-                background: "white",
-                borderRadius: "16px",
-                border: "2px solid #000",
-                width: 600,
-              }}
+            <SeasonSelect
+              onSeasonsChange={handleSeasonsChange}
+              value={seasons}
+              setValue={setSeasons}
+            />
+            <LazyTable data={playerStats} seasons={seasons} />
+            <Button
+              onClick={handleClose}
+              style={{ left: "50%", transform: "translateX(-50%)" }}
             >
-              <SeasonSelect
-                onSeasonsChange={handleSeasonsChange}
-                value={seasons}
-                setValue={setSeasons}
-              />
-              <LazyTable data={playerStats} seasons={"TRUE"} />
-              <Button
-                onClick={handleClose}
-                style={{ left: "50%", transform: "translateX(-50%)" }}
-              >
-                Close
-              </Button>
-            </Box>
-          </Modal>
-        </>
-      );
-    } else {
-      // otherwise show stats only for single season in non tabulated form
-      return (
-        <>
-          <Button onClick={handleClickOpen}>{player}</Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
+              Close
+            </Button>
+          </Box>
+        </Modal>
+      </>
+    );
+  } else {
+    // otherwise show stats only for single season in non tabulated form
+    return (
+      <>
+        <Button onClick={handleClickOpen}>{player}</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            p={3}
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              background: "white",
+              borderRadius: "16px",
+              border: "2px solid #000",
+              width: 600,
             }}
           >
-            <Box
-              p={3}
-              style={{
-                background: "white",
-                borderRadius: "16px",
-                border: "2px solid #000",
-                width: 600,
-              }}
-            >
-              <SeasonSelect
-                onSeasonsChange={handleSeasonsChange}
-                value={seasons}
-                setValue={setSeasons}
-              />
-              {playerStats.length > 0 ? (
-                <>
-                  <h1>{player}</h1>
-                  {/* fill in the stats with playerSatats state variable*/}
-                  <h2>Team</h2>
-                  <p>PPG {playerStats[0].pts}</p>
-                  <p>REB {playerStats[0].reb}</p>
-                  <p>AST {playerStats[0].ast}</p>
-                  <p>College {playerStats[0].college}</p>
-                  <p>Country {playerStats[0].country}</p>
-                  <p>Games Played {playerStats[0].gp}</p>
-                  <p>Mins Played {playerStats[0].mp}</p>
-                </>
-              ) : (
+            <SeasonSelect
+              onSeasonsChange={handleSeasonsChange}
+              value={seasons}
+              setValue={setSeasons}
+            />
+            {playerStats.length > 0 ? (
+              <>
+                <h1>{player}</h1>
+                {/* fill in the stats with playerSatats state variable*/}
+                <h2>Team</h2>
+                <p>PPG {playerStats[0].pts}</p>
+                <p>REB {playerStats[0].reb}</p>
+                <p>AST {playerStats[0].ast}</p>
+                <p>College {playerStats[0].college}</p>
+                <p>Country {playerStats[0].country}</p>
+                <p>Games Played {playerStats[0].gp}</p>
+                <p>Mins Played {playerStats[0].mp}</p>
+              </>
+            ) : (
+              <>
                 <p>No Player Data</p>
-              )}
-              <Button
-                onClick={handleClose}
-                style={{ left: "50%", transform: "translateX(-50%)" }}
-              >
-                Close
-              </Button>
-            </Box>
-          </Modal>
-        </>
-      );
-    }
+              </>
+            )}
+            <Button
+              onClick={handleClose}
+              style={{ left: "50%", transform: "translateX(-50%)" }}
+            >
+              Close
+            </Button>
+          </Box>
+        </Modal>
+      </>
+    );
   }
 }
 export default PlayerCard;
