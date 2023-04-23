@@ -99,16 +99,23 @@ const player_stats = async function (req, res) {
     allSeasonsToggle = true;
   }
 
+  console.log(allSeasonsToggle);
+  
+
   const seasonsCondition = allSeasonsToggle
-    ? "TRUE"
+    ? ""
     : seasonsParam
-    ? `s.season = ${seasonsParam}`
+    ? `s.season = ${seasonsParam} AND`
     : `s.season = (SELECT MAX(season) FROM Seasons)`;
+
+    console.log(seasonsCondition);
 
   query = `
   SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.mp
   FROM Players p JOIN Seasons s on p.player_id = s.player_id
-  WHERE  ${seasonsCondition} AND player_name = '${player_name}'`;
+  WHERE ${seasonsCondition} player_name = '${player_name}'`;
+
+  console.log(query);
 
   connection.query(query, (err, data) => {
     if (err || data.length === 0) {
