@@ -114,11 +114,6 @@ export function LazyTable({
 
                   <TableRow key={index}>
                     {columns.map((column) => {
-                      if (column === "war_total") {
-                        console.log(row[column]);
-                        console.log(Math.round(row[column]));
-                      }
-                      
                       // check if entry is any award
                       if (
                         row[column] === "nba mvp" ||
