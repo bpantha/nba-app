@@ -84,8 +84,6 @@ export function LazyTable({
     return (
       <TableCell {...award}>
         {content}
-        <br></br>
-        {value}
       </TableCell>
     );
   }
