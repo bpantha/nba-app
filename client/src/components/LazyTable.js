@@ -84,6 +84,7 @@ export function LazyTable({
     return (
       <TableCell {...award}>
         {content}
+
       </TableCell>
     );
   }
@@ -110,8 +111,14 @@ export function LazyTable({
               {data
                 .slice(page * pageSize, page * pageSize + pageSize)
                 .map((row, index) => (
+
                   <TableRow key={index}>
                     {columns.map((column) => {
+                      if (column === "war_total") {
+                        console.log(row[column]);
+                        console.log(Math.round(row[column]));
+                      }
+                      
                       // check if entry is any award
                       if (
                         row[column] === "nba mvp" ||
@@ -132,11 +139,16 @@ export function LazyTable({
                             <PlayerCard player={row[column]} />
                           </TableCell>
                         );
-                      } else {
+                      } else if (column === "team" || column === "season") {
                         return (
                           <TableCell key={column}>{row[column]}</TableCell>
                         );
-                      }
+                      } 
+                       else {
+                        return (
+                          <TableCell key={column}>{(row[column]).toFixed(2)}</TableCell>
+                        );
+                      };
                     })}
                   </TableRow>
                 ))}
