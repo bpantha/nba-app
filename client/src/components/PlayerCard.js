@@ -2,6 +2,19 @@ import { useState, useCallback, useEffect } from "react";
 import { SeasonSelect } from "./SeasonSelect";
 import { LazyTable } from "./LazyTable";
 import { Box, Button, Modal } from "@mui/material";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Tooltip,
+} from "recharts";
 import { debounce } from "lodash";
 const config = require("../config.json");
 
@@ -10,38 +23,37 @@ export function PlayerCard({ player }) {
   const [open, setOpen] = useState(false);
   const [playerStats, setPlayerStats] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
-
   console.log(seasons);
-  const handleSeasonsChange = useCallback(
-    debounce((newSelectedSeason) => {
-      setSeasons(newSelectedSeason);
+  console.log(playerStats);
 
+  const handleFetchPlayerStats = useCallback(
+    debounce((seasons) => {
       const fetchData = async () => {
         fetch(
-          `http://${config.server_host}:${config.server_port}/player_stats/${player}/${newSelectedSeason}`
+          `http://${config.server_host}:${config.server_port}/player_stats/${player}/${seasons}`
         )
           .then((res) => res.json())
           .then((resJson) => setPlayerStats(resJson));
       };
       fetchData();
-    }, 50),
-    [seasons]
+    }, 20),
+    [player]
   );
 
-  useEffect(() => {
-    fetch(
-      `http://${config.server_host}:${config.server_port}/player_stats/${player}/${seasons}`
-    )
-      .then((res) => res.json())
-      .then((resJson) => {
-        setPlayerStats(resJson);
-      });
-  }, []);
+  const handleSeasonsChange = (newSelectedSeason) => {
+    setSeasons(newSelectedSeason);
+    handleFetchPlayerStats(newSelectedSeason);
+  };
 
-  // console.log(playerStats);
+  useEffect(() => {
+    if (open) {
+      handleFetchPlayerStats(seasons);
+    }
+  }, [player, open, seasons, handleFetchPlayerStats]);
 
   const handleClickOpen = () => {
     setOpen(true);
+    setSeasons([2022]);
   };
 
   const handleClose = () => {
@@ -49,13 +61,11 @@ export function PlayerCard({ player }) {
     setSeasons([2022]);
   };
 
-  const handleNoSeason = () => {
-    setSeasons([2022]);
-  };
-
-  if (playerStats.length === 0) {
-    return <div>Loading...</div>;
-  }
+  // const chartData = [
+  //   { name: "PTS", value: playerStats.pts },
+  //   { name: "AST", value: playerStats.ast },
+  //   { name: "REB", value: playerStats.reb },
+  // ];
 
   // if all seasons is toggled, show tabulated stats
   if (seasons === "All Seasons") {
@@ -128,14 +138,34 @@ export function PlayerCard({ player }) {
               <>
                 <h1>{player}</h1>
                 {/* fill in the stats with playerSatats state variable*/}
-                <h2>Team</h2>
-                <p>PPG {playerStats[0].pts}</p>
+                <h2>
+                  <p>{playerStats[0].team}</p>
+                </h2>
+                {/* <p>PPG {playerStats[0].pts}</p>
                 <p>REB {playerStats[0].reb}</p>
-                <p>AST {playerStats[0].ast}</p>
+                <p>AST {playerStats[0].ast}</p> */}
                 <p>College {playerStats[0].college}</p>
                 <p>Country {playerStats[0].country}</p>
                 <p>Games Played {playerStats[0].gp}</p>
-                <p>Mins Played {playerStats[0].mp}</p>
+                <ResponsiveContainer
+                  height={250}
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <BarChart
+                    data={[
+                      { name: "PTS", value: playerStats[0].pts },
+                      { name: "AST", value: playerStats[0].ast },
+                      { name: "REB", value: playerStats[0].reb },
+                    ]}
+                    layout="vertical"
+                    margin={{ right: 30 }}
+                  >
+                    <XAxis type="number" datKey="value" domain={[0, 50]} />
+                    <YAxis type="category" dataKey="name" />
+                    <Tooltip />
+                    <Bar dataKey="value" stroke="#8884d8" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
               </>
             ) : (
               <>

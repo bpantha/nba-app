@@ -106,7 +106,7 @@ const player_stats = async function (req, res) {
     : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
   query = `
-  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp
+  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.team
   FROM Players p JOIN Seasons s on p.player_id = s.player_id
   WHERE  ${seasonsCondition} AND player_name = '${player_name}'`;
 
