@@ -32,6 +32,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/player" element={<Player />} />
+          <Route path="/game" element={<Game />} />
           {/* <Route path="/teams" element={<AlbumsPage />} /> */}
           {/* <Route path="/albums/:album_id" element={<AlbumInfoPage />} /> */}
           {/* <Route path="/songs" element={<SongsPage />} /> */}

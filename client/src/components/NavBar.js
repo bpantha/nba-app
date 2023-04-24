@@ -39,6 +39,7 @@ export default function NavBar() {
           <NavText href="/" text="NBA-APP" isMain />
           <NavText href="/teams" text="Teams" />
           <NavText href="/player" text="Players" />
+          <NavText href="/game" text="Games" />
         </Toolbar>
       </Container>
     </AppBar>
