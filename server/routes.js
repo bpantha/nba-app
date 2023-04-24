@@ -648,49 +648,49 @@ ORDER BY avg_raptor ASC;`,
 
 //route 11: GET /teamwork
 const teamwork = async function (req, res) {
-  try {
-    const teams = connection.query(`
-      SELECT team_name, MAX(elo) AS max_elo
-      FROM teams
-      GROUP BY team_name
-      ORDER BY max_elo DESC
-    `);
-
-    const teamNames = teams.map((team) => team.team_name);
-
-    const topPlayers = connection.query(`
-      SELECT player_name, season
-      FROM raptor_stats
-      WHERE player_name NOT IN (
-        SELECT player_name
-        FROM raptor_stats
-        GROUP BY player_name, season
-        ORDER BY SUM(war) DESC
-        LIMIT 20
-      )
-    `);
-
-    const topPlayerNames = topPlayers.map((player) => player.player_name);
-
-    const filteredTeams = await connection.query(
-      `
-      SELECT *
-      FROM teams
-      WHERE team_name IN (${teamNames.map(() => "?").join(",")})
-      AND team_name NOT IN (
-        SELECT team_name
-        FROM player_stats
-        WHERE player_name IN (${topPlayerNames.map(() => "?").join(",")})
-      )
-    `,
-      [...teamNames, ...topPlayerNames]
-    );
-
-    res.json(filteredTeams);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  const seasonsParam = req.params.season;
+  let allSeasonsToggle = false;
+  if (seasonsParam.length > 4) {
+    allSeasonsToggle = true;
   }
+
+  const seasonsCondition = allSeasonsToggle
+    ? "TRUE"
+    : seasonsParam
+    ? `r.season = ${seasonsParam}`
+    : `r.season = (SELECT MAX(season) FROM Seasons)`;
+
+  const query = `
+  WITH eligible_players  (player_id, season) AS (
+    SELECT distinct s.player_id, s.season FROM Seasons s WHERE s.mp>1500 AND s.season_type = 'RS'),
+ranks (player_id, team, season, ranking_year, ranking_team) AS (SELECT s.player_id, s.team, s.season,
+        rank()  OVER (PARTITION BY s.season ORDER BY s.raptor_total DESC) as ranking_year,
+        rank()  OVER (PARTITION BY s.season, s.team ORDER BY s.raptor_total DESC) as ranking_team
+FROM eligible_players e JOIN Seasons s on e.player_id = s.player_id and e.season = s.season and s.season_type = 'RS'
+ORDER BY season),
+top_teams (team, season) as (SELECT distinct s.team, s.season
+FROM ranks r join Seasons s ON r.player_id = s.player_id AND r.season = s.season and s.season_type = 'RS'
+WHERE r.ranking_year <=20),
+eligible_teams (team,season, max_elo) AS (SELECT s.team, s.season, MAX(elo_n) AS max_elo
+FROM Games g
+          JOIN Seasons s on s.team = g.team_id AND s.season = g.year_id and s.season_type = 'RS'
+WHERE NOT EXISTS (SELECT DISTINCT * FROM top_teams t WHERE t.team = s.team AND t.season = s.season)
+GROUP BY team, season
+ORDER BY max_elo DESC)
+SELECT t.team,t.season, max_elo, player_name as best_player, ranking_year as best_player_ranking
+from eligible_teams t join ranks r on t.team = r.team and t.season = r.season
+join Players p ON p.player_id = r.player_id
+where r.ranking_team = 1 and ${seasonsCondition}
+order by max_elo DESC`;
+
+  connection.query(query, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 };
 
 module.exports = {
