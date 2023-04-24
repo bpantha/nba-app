@@ -34,11 +34,13 @@ export function PlayerCard({ player }) {
         )
           .then((res) => res.json())
           .then((resJson) => setPlayerStats(resJson));
+          
       };
       fetchData();
     }, 20),
     [player]
   );
+
 
   const handleSeasonsChange = (newSelectedSeason) => {
     setSeasons(newSelectedSeason);
@@ -51,6 +53,18 @@ export function PlayerCard({ player }) {
     }
   }, [player, open, seasons, handleFetchPlayerStats]);
 
+  useEffect(() => {
+    fetch(
+      `http://${config.server_host}:${config.server_port}/player_stats/${player}/${seasons}`
+    )
+      .then((res) => res.json())
+      .then((resJson) => {
+        setPlayerStats(resJson);
+      });
+
+  }, [seasons]);
+
+
   const handleClickOpen = () => {
     setOpen(true);
     setSeasons([2022]);
@@ -60,6 +74,7 @@ export function PlayerCard({ player }) {
     setOpen(false);
     setSeasons([2022]);
   };
+
 
   // const chartData = [
   //   { name: "PTS", value: playerStats.pts },
@@ -71,6 +86,46 @@ export function PlayerCard({ player }) {
   if (seasons === "All Seasons") {
     return (
       <>
+
+  function calculateAveragePlayerStats(stats) {
+
+    let totalPts = 0;
+    let totalReb = 0;
+    let totalAst = 0;
+    let totalGp = 0;
+    let totalMp = 0;
+    const numSeasons = stats.length;
+  
+    for (const season of stats) {
+      console.log(season);
+      totalPts += season.pts;
+      totalReb += season.reb;
+      totalAst += season.ast;
+      totalGp += season.gp;
+      totalMp += season.mp;
+    }
+
+    return {
+      ppg: parseFloat((totalPts / numSeasons).toFixed(1)),
+      reb: parseFloat((totalReb / numSeasons).toFixed(1)),
+      ast: parseFloat((totalAst / numSeasons).toFixed(1)),
+      gp: parseFloat((totalGp / numSeasons).toFixed(1)),
+      mp: parseFloat((totalMp / numSeasons).toFixed(1))
+    };
+  } 
+
+  if (playerStats.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  // if all seasons is toggled, show tabulated stats
+  if (seasons) {
+    if (seasons === "All Seasons") {
+
+      const averageStats = playerStats.length > 0 ? calculateAveragePlayerStats(playerStats) : null;
+      return (
+        <>
+
         <Button onClick={handleClickOpen}>{player}</Button>
         <Modal
           open={open}
@@ -95,7 +150,28 @@ export function PlayerCard({ player }) {
               value={seasons}
               setValue={setSeasons}
             />
+
             <LazyTable data={playerStats} seasons={seasons} />
+              {playerStats.length > 0 ? (
+                <>
+                  <h1>{player}</h1>
+                  <h2>Team</h2>
+                  {/* Render the average stats */}
+                  {averageStats && (
+                    <>
+                      <p>PPG {averageStats.ppg}</p>
+                      <p>REB {averageStats.reb}</p>
+                      <p>AST {averageStats.ast}</p>
+                    </>
+                  )}
+                  <p>College {playerStats[0].college}</p>
+                  <p>Country {playerStats[0].country}</p>
+                  <p>Games Played {playerStats[0].gp}</p>
+                  <p>Mins Played {playerStats[0].mp}</p>
+                </>
+              ) : (
+                <p>No Player Data</p>
+              )}
             <Button
               onClick={handleClose}
               style={{ left: "50%", transform: "translateX(-50%)" }}
@@ -122,6 +198,15 @@ export function PlayerCard({ player }) {
         >
           <Box
             p={3}
+      );
+    } else {
+      // otherwise show stats only for single season in non tabulated form
+      return (
+        <>
+          <Button onClick={handleClickOpen}>{player}</Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
             style={{
               background: "white",
               borderRadius: "16px",
