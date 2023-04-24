@@ -25,7 +25,7 @@ app.get("/award/:season?", routes.award);
 app.get("/awards_by_team", routes.awards_by_team);
 app.get("/draft/good", routes.draft_good);
 app.get("/draft/bad", routes.draft_bad);
-app.get("/teamwork/:season?", routes.teamwork);
+app.get("/teamwork/:season", routes.teamwork);
 app.get("/teams/:season?", routes.teams);
 
 

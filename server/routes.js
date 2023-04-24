@@ -670,8 +670,9 @@ FROM Games g
 WHERE NOT EXISTS (SELECT DISTINCT * FROM top_teams t WHERE t.team = s.team AND t.season = s.season)
 GROUP BY team, season
 ORDER BY max_elo DESC)
-SELECT t.team,t.season, max_elo, player_id as best_player, ranking_year as best_player_ranking
+SELECT t.team,t.season, max_elo, player_name as best_player, ranking_year as best_player_ranking
 from eligible_teams t join ranks r on t.team = r.team and t.season = r.season
+join Players p ON p.player_id = r.player_id
 where r.ranking_team = 1 and ${seasonsCondition}
 order by max_elo DESC`;
 
