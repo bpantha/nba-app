@@ -229,9 +229,15 @@ export function PlayerCard({ player }) {
                 {/* <p>PPG {playerStats[0].pts}</p>
                 <p>REB {playerStats[0].reb}</p>
                 <p>AST {playerStats[0].ast}</p> */}
-                <p>College {playerStats[0].college}</p>
-                <p>Country {playerStats[0].country}</p>
-                <p>Games Played {playerStats[0].gp}</p>
+                <p style={{ display: "flex", justifyContent: "center" }}>
+                  College: {playerStats[0].college}
+                </p>
+                <p style={{ display: "flex", justifyContent: "center" }}>
+                  Country: {playerStats[0].country}
+                </p>
+                <p style={{ display: "flex", justifyContent: "center" }}>
+                  Games Played: {playerStats[0].gp}
+                </p>
                 <ResponsiveContainer
                   height={250}
                   style={{ display: "flex", justifyContent: "center" }}
