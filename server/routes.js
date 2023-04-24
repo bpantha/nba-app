@@ -111,7 +111,7 @@ const player_stats = async function (req, res) {
     console.log(seasonsCondition);
 
   query = `
-  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.mp
+  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.team
   FROM Players p JOIN Seasons s on p.player_id = s.player_id
   WHERE ${seasonsCondition} player_name = '${player_name}'`;
 
