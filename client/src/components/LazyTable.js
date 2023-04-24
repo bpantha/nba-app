@@ -81,12 +81,7 @@ export function LazyTable({
       );
     }
 
-    return (
-      <TableCell {...award}>
-        {content}
-
-      </TableCell>
-    );
+    return <TableCell {...award}>{content}</TableCell>;
   }
 
   if (seasons) {
@@ -111,7 +106,6 @@ export function LazyTable({
               {data
                 .slice(page * pageSize, page * pageSize + pageSize)
                 .map((row, index) => (
-
                   <TableRow key={index}>
                     {columns.map((column) => {
                       // check if entry is any award
@@ -138,12 +132,11 @@ export function LazyTable({
                         return (
                           <TableCell key={column}>{row[column]}</TableCell>
                         );
-                      } 
-                       else {
+                      } else {
                         return (
-                          <TableCell key={column}>{(row[column]).toFixed(2)}</TableCell>
+                          <TableCell key={column}>{row[column]}</TableCell>
                         );
-                      };
+                      }
                     })}
                   </TableRow>
                 ))}
