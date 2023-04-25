@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { SeasonSelect } from "../components/SeasonSelect";
 import { LazyTable } from "../components/LazyTable";
-import { debounce } from "lodash";
+import { debounce, sortBy } from "lodash";
 const config = require("../config.json");
 
 const Game = () => {
@@ -14,23 +14,20 @@ const Game = () => {
     fontFamily: "monospace",
   };
 
-  const [seasons, setSeasons] = useState(2015);
+  const [seasons, setSeasons] = useState([2015]);
   const [teams, setTeams] = useState([]);
   const [team1, setTeam1] = useState("");
   const [team2, setTeam2] = useState("");
   const [sort, setSort] = useState("");
-  const [sortOrder, setSortOrder] = useState("ascending");
+  const [sortOrder, setSortOrder] = useState("ASC");
   const [searchResults, setSearchResults] = useState([]);
   const [topUpsets, setTopUpsets] = useState([]);
-  const [gameOutcome, setGameOutcome] = useState("all");
+  const [gameOutcome, setGameOutcome] = useState("ALL");
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
       console.log("Selected season:", newSelectedSeason);
-      setSeasons(parseInt(newSelectedSeason, 10));
-      if (newSelectedSeason > 2015) {
-        setSeasons(2015);
-      }
+      setSeasons(newSelectedSeason);
     }, 50),
     []
   );
@@ -72,14 +69,16 @@ const Game = () => {
     const fetchData = async () => {
       if (team1 && team2 && sort) {
         fetch(
-          `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/total_pts/${sortOrder}`
+          `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
         )
           .then((res) => res.json())
           .then((resJson) => setSearchResults(resJson));
+      } else {
+        setSearchResults([]); // Clear the search results if the conditions are not met
       }
     };
     fetchData();
-  }, [seasons, team1, team2, sort, sortOrder, gameOutcome]);
+  }, [seasons, team1, team2, gameOutcome, sort, sortOrder]);
 
   // Fetch top upsets
   useEffect(() => {
@@ -121,6 +120,9 @@ const Game = () => {
     }
   };
 
+  console.log(team1);
+  console.log(team2);
+
   const handleSortChange = (e) => {
     setSort(e.target.value);
   };
@@ -128,6 +130,21 @@ const Game = () => {
   const handleSortOrderChange = (e) => {
     setSortOrder(e.target.value);
   };
+
+  // searchResults
+  // topUpsets
+  const keysToKeep = ["year_id"];
+
+  const filteredResults = searchResults.map((result) => {
+    return Object.keys(result)
+      .filter((key) => keysToKeep.includes(key))
+      .reduce((acc, key) => {
+        acc[key] = result[key];
+        return acc;
+      }, {});
+  });
+
+  console.log(filteredResults);
 
   return (
     <div>
@@ -151,12 +168,14 @@ const Game = () => {
           value={seasons}
           setValue={setSeasons}
           style={selectStyle}
+          max={2015}
         />
         <select onChange={(e) => handleTeamChange(e, 1)} style={selectStyle}>
           <option value="">Select Team 1</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
-              {team.fran_id}
+              {team.team_id} - {team.fran_id}{" "}
+              {/* Display team ID alongside franchise ID */}
             </option>
           ))}
         </select>
@@ -164,17 +183,21 @@ const Game = () => {
           <option value="">Select Team 2</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
-              {team.fran_id}
+              {team.team_id} - {team.fran_id}{" "}
+              {/* Display team ID alongside franchise ID */}
             </option>
           ))}
         </select>
+
         <select onChange={handleSortChange} style={selectStyle}>
           <option value="">Sort by</option>
           {/* Add sort options here */}
+          <option value="total_pts">Total Points</option>
         </select>
+
         <select onChange={handleSortOrderChange} style={selectStyle}>
-          <option value="ascending">Ascending</option>
-          <option value="descending">Descending</option>
+          <option value="ASC">Ascending</option>
+          <option value="DESC">Descending</option>
         </select>
         <select onChange={handleGameOutcomeChange} style={selectStyle}>
           <option value="ALL">All</option>
@@ -183,7 +206,7 @@ const Game = () => {
         </select>
       </div>
       <h1 style={h1Style}>Search Results</h1>
-      <LazyTable data={searchResults} seasons={seasons} />
+      <LazyTable data={filteredResults} seasons={seasons} />
       <h1 style={h1Style}>Top Upsets</h1>
       <LazyTable data={topUpsets} seasons={seasons} />
     </div>

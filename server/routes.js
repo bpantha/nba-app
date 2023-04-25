@@ -100,6 +100,7 @@ const player_stats = async function (req, res) {
   }
 
   console.log(allSeasonsToggle);
+  
 
   const seasonsCondition = allSeasonsToggle
     ? ""
@@ -107,10 +108,10 @@ const player_stats = async function (req, res) {
     ? `s.season = ${seasonsParam} AND`
     : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
-  console.log(seasonsCondition);
+    console.log(seasonsCondition);
 
   query = `
-  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.mp
+  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.team
   FROM Players p JOIN Seasons s on p.player_id = s.player_id
   WHERE ${seasonsCondition} player_name = '${player_name}'`;
 
@@ -139,7 +140,7 @@ const player_stats = async function (req, res) {
 };
 
 // Route 6: GET /roster
-const roster = async function (req, res) {
+const roster = async function(req, res) {
   const team = req.params.team;
   const seasonsParam = req.params.season;
   let allSeasonsToggle = false;
@@ -154,13 +155,12 @@ const roster = async function (req, res) {
     : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
   const page = req.query.page;
+  
+  const pageSize = (req.query.page_size ?? 10);
 
-  const pageSize = req.query.page_size ?? 10;
-
-  if (seasonsCondition == "TRUE") {
+  if (seasonsCondition == 'TRUE') {
     if (!page) {
-      connection.query(
-        `
+    connection.query(`
     WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
     FROM Seasons s 
     WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
@@ -169,23 +169,17 @@ const roster = async function (req, res) {
     GROUP BY p.player_id)
     SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
     FROM Career c JOIN Players p on c.player_id = p.player_id
-    ORDER BY c.mp DESC`,
-        (err, data) => {
-          if (err || data.length === 0) {
-            console.log(err);
-            res.json({});
-          } else {
-            res.json(data);
-          }
-        }
-      );
+    ORDER BY c.mp DESC`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
     } else {
-      const offset = pageSize * (page - 1);
-      if (page === 0) {
-        offset = 0;
-      }
-      connection.query(
-        `
+      res.json(data);
+    }
+  });} else {
+    const offset = pageSize*(page-1);
+    if (page===0) {offset = 0;}
+    connection.query(`
     WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
       FROM Seasons s 
       WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
@@ -195,37 +189,33 @@ const roster = async function (req, res) {
       SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
       FROM Career c JOIN Players p on c.player_id = p.player_id
       ORDER BY c.mp DESC
-      LIMIT ${pageSize} OFFSET ${offset}`,
-        (err, data) => {
-          if (err || data.length === 0) {
-            console.log(err);
-            res.json({});
-          } else {
-            res.json(data);
-          }
-        }
-      );
+      LIMIT ${pageSize} OFFSET ${offset}`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
     }
+  });
+  }
   } else {
-    connection.query(
-      `
+  connection.query(`
   WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
   FROM Seasons s 
   WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS')
   SELECT p.player_name, r.gp, r.mp, r.pts, r.reb, r.ast, p.player_height, p.player_weight, p.country, p.college
   FROM Players p NATURAL JOIN Roster r
-  ORDER BY r.mp DESC`,
-      (err, data) => {
-        if (err || data.length === 0) {
-          console.log(err);
-          res.json({});
-        } else {
-          res.json(data);
-        }
-      }
-    );
-  }
-};
+  ORDER BY r.mp DESC`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });}
+
+}
+
 
 // Route 5: GET /best_players
 const best_players = async function (req, res) {
@@ -335,35 +325,43 @@ const game = async function (req, res) {
 
 // Route 7: GET /upsets/:season?
 const upsets = async function (req, res) {
-  // const season = req.query.season;
-  const seasonsParam = req.params.season;
-  let allSeasonsToggle = false;
-  if (seasonsParam.length > 4) {
-    allSeasonsToggle = true;
-  }
+  const season = req.query.season;
 
-  const seasonsCondition = allSeasonsToggle
-    ? "TRUE"
-    : seasonsParam
-    ? `g.year_id = ${seasonsParam}`
-    : `g.year_id = (SELECT MAX(year_id) FROM Games)`;
-
-  connection.query(
-    `
-   SELECT *
+  if (!season) {
+    connection.query(
+      `
+    SELECT *
     FROM Games g
-    WHERE ${seasonsCondition} and g.game_result = 'W'
-     ORDER BY g.forecast ASC
-     LIMIT 50`,
-    (err, data) => {
-      if (err || data.length === 0) {
-        console.log(err);
-        res.json({});
-      } else {
-        res.json(data);
+    WHERE g.game_result = 'W'
+    ORDER BY g.forecast ASC
+    LIMIT 50`,
+      (err, data) => {
+        if (err || data.length === 0) {
+          console.log(err);
+          res.json({});
+        } else {
+          res.json(data);
+        }
       }
-    }
-  );
+    );
+  } else {
+    connection.query(
+      `
+    SELECT *
+    FROM Games g
+    WHERE g.year_id = '${season}' and g.game_result = 'W'
+    ORDER BY g.forecast ASC
+    LIMIT 50`,
+      (err, data) => {
+        if (err || data.length === 0) {
+          console.log(err);
+          res.json({});
+        } else {
+          res.json(data);
+        }
+      }
+    );
+  }
 };
 
 // Route 12: GET /award
@@ -652,8 +650,6 @@ ORDER BY avg_raptor ASC;`,
 const teamwork = async function (req, res) {
   const seasonsParam = req.params.season;
   let allSeasonsToggle = false;
-  // let playerOne = request.params.playerOne;
-  // let playerTwo = request.params.playerTwo;
   if (seasonsParam.length > 4) {
     allSeasonsToggle = true;
   }
@@ -697,6 +693,73 @@ order by max_elo DESC`;
   });
 };
 
+// Route 5: GET /search_games
+const search_games = async function (req, res) {
+  
+
+  const seasonsParam = req.params.season;
+  let allSeasonsToggle = false;
+  if (seasonsParam.length > 4) {
+    allSeasonsToggle = true;
+  }
+
+  const seasonsCondition = allSeasonsToggle
+    ? "TRUE"
+    : seasonsParam
+    ? `g.year_id = ${seasonsParam}`
+    : `g.year_id = (SELECT MAX(year_id) FROM Games)`;
+
+  const team1Param = req.params.team1;
+  let allTeam1sToggle = false;
+  if (team1Param == 'ALL') {
+    allTeam1sToggle = true;
+  }
+
+  const team1Condition = allTeam1sToggle
+    ? "TRUE"
+    :  `g.team_id = '${team1Param}'`;
+
+  const team2Param = req.params.team2;
+  let allTeam2sToggle = false;
+  if (team2Param == 'ALL') {
+    allTeam2sToggle = true;
+  }
+  
+  const team2Condition = allTeam2sToggle
+      ? "TRUE"
+      :  `g.opp_id = '${team2Param}'`;
+
+  
+  const resultsParam = req.params.result;
+  let allResultsToggle = false;
+  if (resultsParam == 'ALL') {
+    allResultsToggle = true;
+    }
+      
+  const resultCondition = allResultsToggle
+      ? "TRUE"
+      :  `g.game_result = '${resultsParam}'`;    
+      
+  const sortParam = req.params.sort;
+  const sortOrder = req.params.sortOrder;
+  
+  connection.query(
+    `SELECT g.*, pts+opp_pts as total_pts, pts-opp_pts as pts_diff, (elo_i+opp_elo_i)/2 as avg_elo, elo_i-opp_elo_i as elo_diff
+    FROM Games g
+    WHERE ${seasonsCondition} and ${team1Condition} and ${team2Condition} and ${resultCondition}
+    ORDER BY ${sortParam} ${sortOrder}`,
+    (err, data) => {
+      if (err || data.length === 0) {
+        console.log(err);
+        res.json({});
+      } else {
+        res.json(data);
+      }
+    }
+  );
+};
+
+
 module.exports = {
   authors,
   player,
@@ -712,4 +775,7 @@ module.exports = {
   teamwork,
   teams,
   roster,
+  search_games
 };
+
+

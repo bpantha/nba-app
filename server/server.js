@@ -26,7 +26,8 @@ app.get("/awards_by_team", routes.awards_by_team);
 app.get("/draft/good", routes.draft_good);
 app.get("/draft/bad", routes.draft_bad);
 app.get("/teamwork/:season", routes.teamwork);
-app.get("/teams/:season?", routes.teams);
+app.get("/teams/:season?", routes.teams)
+app.get("/search_games/:season/:team1/:team2/:result/:sort/:sortOrder", routes.search_games);
 
 
 app.listen(config.server_port, () => {

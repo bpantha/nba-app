@@ -11,7 +11,7 @@ function valueText(value) {
   return `${value}`;
 }
 
-export function SeasonSelect({ onSeasonsChange, value, setValue }) {
+export function SeasonSelect({ onSeasonsChange, value, setValue, max = 2022 }) {
   const allSeasonsSelected = value === "All Seasons";
 
   const handleChange = (event, newValue) => {
@@ -74,7 +74,7 @@ export function SeasonSelect({ onSeasonsChange, value, setValue }) {
           valueLabelDisplay="auto"
           getAriaValueText={valueText}
           min={1997}
-          max={2022}
+          max={max}
           step={1}
           disabled={allSeasonsSelected}
           sx={allSeasonsSelected ? { color: "grey.500" } : {}}
