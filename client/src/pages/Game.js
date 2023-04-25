@@ -26,7 +26,6 @@ const Game = () => {
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
-      console.log("Selected season:", newSelectedSeason);
       setSeasons(newSelectedSeason);
     }, 50),
     []
@@ -129,9 +128,6 @@ const Game = () => {
       setTeam2(e.target.value);
     }
   };
-
-  console.log(team1);
-  console.log(team2);
 
   const handleSortChange = (e) => {
     setSort(e.target.value);
@@ -297,7 +293,6 @@ const Game = () => {
           <option value="total_pts">Total Points</option>
           <option value="avg_elo">Average Elo</option>
           <option value="forecast">Forecast</option>
-
         </select>
 
         <select onChange={handleSortOrderChange} style={selectStyle}>

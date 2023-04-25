@@ -7,7 +7,7 @@ const config = require("../config.json");
 
 const Team = () => {
   const { season } = useParams();
-  const [seasons, setSeasons] = useState([2022]);
+  const [seasons, setSeasons] = useState([2015]);
   const [awardByTeam, setAwardByTeam] = useState([]);
   const [teamworkData, setTeamworkData] = useState([]); // New state variable for teamwork data
 
@@ -20,16 +20,14 @@ const Team = () => {
 
   useEffect(() => {
     const fetchAwardsByTeam = async () => {
-      fetch(
-        `http://${config.server_host}:${config.server_port}/awards_by_team`
-      )
+      fetch(`http://${config.server_host}:${config.server_port}/awards_by_team`)
         .then((res) => res.json())
         .then((resJson) => setAwardByTeam(resJson));
     };
 
     const fetchTeamworkData = async () => {
       fetch(
-        `http://${config.server_host}:${config.server_port}/teamwork/${season}`
+        `http://${config.server_host}:${config.server_port}/teamwork/${seasons}`
       )
         .then((res) => res.json())
         .then((resJson) => setTeamworkData(resJson));
@@ -37,7 +35,7 @@ const Team = () => {
 
     fetchAwardsByTeam();
     fetchTeamworkData();
-  }, [season]);
+  }, [seasons]);
 
   const h1Style = {
     marginRight: "30px",
@@ -54,11 +52,12 @@ const Team = () => {
         onSeasonsChange={handleSeasonsChange}
         value={seasons}
         setValue={setSeasons}
+        max={2015}
       />
+      <h1 style={h1Style}>Teamwork</h1>
+      <LazyTable data={teamworkData} seasons={seasons} />
       <h1 style={h1Style}>Awards By Team</h1>
       <LazyTable data={awardByTeam} seasons={seasons} />
-      <h1 style={h1Style}>Teamwork</h1> {/* New header for teamwork data */}
-      <LazyTable data={teamworkData} seasons={seasons} /> {/* New LazyTable for teamwork data */}
     </div>
   );
 };
