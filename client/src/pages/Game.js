@@ -27,8 +27,6 @@ const Game = () => {
     []
   );
   
-  
-
   const handleGameOutcomeChange = (e) => {
     setGameOutcome(e.target.value);
   };
@@ -51,7 +49,7 @@ const Game = () => {
     const fetchData = async () => {
       if (team1 && team2 && sort) {
         fetch(
-          `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${sort}/${sortOrder}/${gameOutcome}`
+          `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/total_pts/${sortOrder}`
         )
           .then((res) => res.json())
           .then((resJson) => setSearchResults(resJson));
