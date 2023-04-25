@@ -1,30 +1,43 @@
 import { useState, useCallback, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { SeasonSelect } from "../components/SeasonSelect";
 import { LazyTable } from "../components/LazyTable";
 import { debounce } from "lodash";
 const config = require("../config.json");
 
 const Team = () => {
-  const [seasons, setSeasons] = useState([2015]);
+  const { season } = useParams();
+  const [seasons, setSeasons] = useState([2022]);
   const [awardByTeam, setAwardByTeam] = useState([]);
+  const [teamworkData, setTeamworkData] = useState([]); // New state variable for teamwork data
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
       setSeasons(newSelectedSeason);
     }, 50),
-    [] // Remove seasons from the dependencies array
+    []
   );
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAwardsByTeam = async () => {
       fetch(
-        `http://${config.server_host}:${config.server_port}/awards_by_team/`
+        `http://${config.server_host}:${config.server_port}/awards_by_team`
       )
         .then((res) => res.json())
         .then((resJson) => setAwardByTeam(resJson));
     };
-    fetchData();
-  }, []);
+
+    const fetchTeamworkData = async () => {
+      fetch(
+        `http://${config.server_host}:${config.server_port}/teamwork/${season}`
+      )
+        .then((res) => res.json())
+        .then((resJson) => setTeamworkData(resJson));
+    };
+
+    fetchAwardsByTeam();
+    fetchTeamworkData();
+  }, [season]);
 
   const h1Style = {
     marginRight: "30px",
@@ -44,6 +57,8 @@ const Team = () => {
       />
       <h1 style={h1Style}>Awards By Team</h1>
       <LazyTable data={awardByTeam} seasons={seasons} />
+      <h1 style={h1Style}>Teamwork</h1> {/* New header for teamwork data */}
+      <LazyTable data={teamworkData} seasons={seasons} /> {/* New LazyTable for teamwork data */}
     </div>
   );
 };
