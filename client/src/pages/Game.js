@@ -26,10 +26,6 @@ const Game = () => {
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
-<<<<<<< HEAD
-      //console.log("Selected season:", newSelectedSeason);
-=======
->>>>>>> 4bd66aedac7e360eae05b72d02105ade2f5ce281
       setSeasons(newSelectedSeason);
     }, 50),
     []
@@ -125,6 +121,10 @@ const Game = () => {
     borderBottom: "4px solid #0074D9", // Added a solid bottom border
   };
 
+  const roundToTwoDecimalPlaces = (num) => {
+    return parseFloat(num.toFixed(2));
+  };
+
   const handleTeamChange = (e, teamIndex) => {
     if (teamIndex === 1) {
       setTeam1(e.target.value);
@@ -192,7 +192,11 @@ const Game = () => {
     const renamedRow = {};
     for (const key in row) {
       if (columnMapping[key]) {
-        renamedRow[columnMapping[key]] = row[key];
+        // Round the number values to two decimal places
+        renamedRow[columnMapping[key]] =
+          typeof row[key] === "number"
+            ? roundToTwoDecimalPlaces(row[key])
+            : row[key];
       }
     }
     return renamedRow;
@@ -239,7 +243,11 @@ const Game = () => {
       const newRow = {};
       for (const key in row) {
         if (topUpsetsKeysToKeep.includes(key) && topUpsetsColumnMapping[key]) {
-          newRow[topUpsetsColumnMapping[key]] = row[key];
+          // Round the number values to two decimal places
+          newRow[topUpsetsColumnMapping[key]] =
+            typeof row[key] === "number"
+              ? roundToTwoDecimalPlaces(row[key])
+              : row[key];
         }
       }
       return newRow;
@@ -262,16 +270,14 @@ const Game = () => {
   return (
     <div>
       <h1 style={h1Style}>Games</h1>
-      <div
-        style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
-      >
-        <SeasonSelect
-          onSeasonsChange={handleSeasonsChange}
-          value={seasons}
-          setValue={setSeasons}
-          style={selectStyle}
-          max={2015}
-        />
+      <SeasonSelect
+        onSeasonsChange={handleSeasonsChange}
+        value={seasons}
+        setValue={setSeasons}
+        style={selectStyle}
+        max={2015}
+      />
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
         <select onChange={(e) => handleTeamChange(e, 1)} style={selectStyle}>
           <option value="">Select Team 1</option>
           {teams.map((team) => (
@@ -290,7 +296,7 @@ const Game = () => {
             </option>
           ))}
         </select>
-
+  
         <select onChange={handleSortChange} style={selectStyle}>
           <option value="">Sort by</option>
           {/* Add sort options here */}
@@ -298,7 +304,7 @@ const Game = () => {
           <option value="avg_elo">Average Elo</option>
           <option value="forecast">Forecast</option>
         </select>
-
+  
         <select onChange={handleSortOrderChange} style={selectStyle}>
           <option value="ASC">Ascending</option>
           <option value="DESC">Descending</option>
@@ -310,10 +316,20 @@ const Game = () => {
         </select>
       </div>
       <h1 style={h1Style}>Search Results</h1>
-      <LazyTable data={renamedSearchResults} seasons={seasons} />
-      <h1 style={h1Style}>Top Upsets By Season</h1>
-      <LazyTable data={renamedTopUpsets} seasons={seasons} />
+      <LazyTable
+        data={renamedSearchResults}
+        seasons={seasons}
+        roundToTwoDecimalPlaces={roundToTwoDecimalPlaces}
+      />
+      <h1 style={h1Style}>Top Upsets In {seasons}</h1>
+      <LazyTable
+        data={filterAndRenameTopUpsetsColumns(topUpsets)}
+        seasons={seasons}
+        roundToTwoDecimalPlaces={roundToTwoDecimalPlaces}
+      />
     </div>
   );
+  
+  
 };
 export default Game;

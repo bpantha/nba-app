@@ -41,15 +41,19 @@ const Team = () => {
   }, [seasons]);
 
   const h1Style = {
-    marginRight: "30px",
+    fontSize: "3rem",
+    textAlign: "center",
+    margin: "2rem 0",
+    background: "linear-gradient(to right, #003459, #0074D9)", // Updated gradient colors
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
     fontFamily: "monospace",
     fontWeight: 700,
     letterSpacing: ".3rem",
-    textAlign: "center",
-    color: "#2E4A62",
+    textTransform: "uppercase", // Added text transformation
+    paddingBottom: "0.3rem", // Added padding to the bottom
+    borderBottom: "4px solid #0074D9", // Added a solid bottom border
   };
-
-  //console.log(season);
 
   return (
     <div>
@@ -57,11 +61,15 @@ const Team = () => {
         onSeasonsChange={handleSeasonsChange}
         value={seasons}
         setValue={setSeasons}
-<<<<<<< HEAD
-        max={[2022]}
-=======
         max={2015}
->>>>>>> 4bd66aedac7e360eae05b72d02105ade2f5ce281
+        style={{
+          margin: "0.5rem",
+          padding: "0.5rem",
+          borderRadius: "4px",
+          border: "1px solid #2E4A62",
+          fontSize: "1rem",
+          fontFamily: "monospace",
+        }}
       />
       <h1 style={h1Style}>Teamwork</h1>
       <LazyTable data={teamworkData} seasons={seasons} />
