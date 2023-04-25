@@ -26,7 +26,10 @@ const Game = () => {
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
+<<<<<<< HEAD
       //console.log("Selected season:", newSelectedSeason);
+=======
+>>>>>>> 4bd66aedac7e360eae05b72d02105ade2f5ce281
       setSeasons(newSelectedSeason);
     }, 50),
     []
@@ -129,9 +132,6 @@ const Game = () => {
       setTeam2(e.target.value);
     }
   };
-
-  console.log(team1);
-  console.log(team2);
 
   const handleSortChange = (e) => {
     setSort(e.target.value);
