@@ -20,6 +20,9 @@ const Game = () => {
     debounce((newSelectedSeason) => {
       console.log("Selected season:", newSelectedSeason);
       setSeasons(parseInt(newSelectedSeason, 10));
+      if (newSelectedSeason > 2015){
+        setSeasons(2015);
+      }
     }, 50),
     []
   );
@@ -151,11 +154,8 @@ const Game = () => {
       <h1 style={h1Style}>Search Results</h1>
       <LazyTable data={searchResults} seasons={seasons} />
       <h1 style={h1Style}>Top Upsets</h1>
-      {seasons <= 2015 ? (
-        <LazyTable data={topUpsets} seasons={seasons} />
-      ) : (
-        <p>Data only goes up to 2015</p>
-      )}
+     
+      <LazyTable data={topUpsets} seasons={seasons} />
     </div>
   );
 
