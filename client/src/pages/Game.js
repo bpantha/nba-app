@@ -49,7 +49,6 @@ const Game = () => {
     setGameOutcome(e.target.value);
   };
 
-  // Fetch teams based on the selected season
   useEffect(() => {
     const fetchData = async () => {
       fetch(
@@ -68,7 +67,7 @@ const Game = () => {
     const fetchData = async () => {
       if (team1 && team2 && sort) {
         if (team1 === team2) {
-          setSearchResults([]); // Clear the search results if both teams are the same
+          setSearchResults([]);
         } else {
           fetch(
             `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
@@ -77,13 +76,12 @@ const Game = () => {
             .then((resJson) => setSearchResults(resJson));
         }
       } else {
-        setSearchResults([]); // Clear the search results if the conditions are not met
+        setSearchResults([]);
       }
     };
     fetchData();
   }, [seasons, team1, team2, gameOutcome, sort, sortOrder]);
 
-  // Fetch top upsets
   useEffect(() => {
     const fetchData = async () => {
       fetch(
@@ -110,15 +108,15 @@ const Game = () => {
     fontSize: "3rem",
     textAlign: "center",
     margin: "2rem 0",
-    background: "linear-gradient(to right, #003459, #0074D9)", // Updated gradient colors
+    background: "linear-gradient(to right, #003459, #0074D9)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     fontFamily: "monospace",
     fontWeight: 700,
     letterSpacing: ".3rem",
-    textTransform: "uppercase", // Added text transformation
-    paddingBottom: "0.3rem", // Added padding to the bottom
-    borderBottom: "4px solid #0074D9", // Added a solid bottom border
+    textTransform: "uppercase",
+    paddingBottom: "0.3rem",
+    borderBottom: "4px solid #0074D9",
   };
 
   const roundToTwoDecimalPlaces = (num) => {
@@ -141,8 +139,6 @@ const Game = () => {
     setSortOrder(e.target.value);
   };
 
-  // searchResults
-  // topUpsets
   const keysToKeep = [
     "year_id",
     "date_game",
@@ -192,7 +188,6 @@ const Game = () => {
     const renamedRow = {};
     for (const key in row) {
       if (columnMapping[key]) {
-        // Round the number values to two decimal places
         renamedRow[columnMapping[key]] =
           typeof row[key] === "number"
             ? roundToTwoDecimalPlaces(row[key])
@@ -243,7 +238,6 @@ const Game = () => {
       const newRow = {};
       for (const key in row) {
         if (topUpsetsKeysToKeep.includes(key) && topUpsetsColumnMapping[key]) {
-          // Round the number values to two decimal places
           newRow[topUpsetsColumnMapping[key]] =
             typeof row[key] === "number"
               ? roundToTwoDecimalPlaces(row[key])
@@ -277,13 +271,14 @@ const Game = () => {
         style={selectStyle}
         max={2015}
       />
-      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
+      <div
+        style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
+      >
         <select onChange={(e) => handleTeamChange(e, 1)} style={selectStyle}>
           <option value="">Select Team 1</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
               {team.team_id} - {team.fran_id}{" "}
-              {/* Display team ID alongside franchise ID */}
             </option>
           ))}
         </select>
@@ -292,19 +287,17 @@ const Game = () => {
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
               {team.team_id} - {team.fran_id}{" "}
-              {/* Display team ID alongside franchise ID */}
             </option>
           ))}
         </select>
-  
+
         <select onChange={handleSortChange} style={selectStyle}>
           <option value="">Sort by</option>
-          {/* Add sort options here */}
           <option value="total_pts">Total Points</option>
           <option value="avg_elo">Average Elo</option>
           <option value="forecast">Forecast</option>
         </select>
-  
+
         <select onChange={handleSortOrderChange} style={selectStyle}>
           <option value="ASC">Ascending</option>
           <option value="DESC">Descending</option>
@@ -329,7 +322,5 @@ const Game = () => {
       />
     </div>
   );
-  
-  
 };
 export default Game;

@@ -9,7 +9,7 @@ const Team = () => {
   const { season } = useParams();
   const [seasons, setSeasons] = useState([2015]);
   const [awardByTeam, setAwardByTeam] = useState([]);
-  const [teamworkData, setTeamworkData] = useState([]); // New state variable for teamwork data
+  const [teamworkData, setTeamworkData] = useState([]);
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
@@ -44,15 +44,15 @@ const Team = () => {
     fontSize: "3rem",
     textAlign: "center",
     margin: "2rem 0",
-    background: "linear-gradient(to right, #003459, #0074D9)", // Updated gradient colors
+    background: "linear-gradient(to right, #003459, #0074D9)", 
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     fontFamily: "monospace",
     fontWeight: 700,
     letterSpacing: ".3rem",
-    textTransform: "uppercase", // Added text transformation
-    paddingBottom: "0.3rem", // Added padding to the bottom
-    borderBottom: "4px solid #0074D9", // Added a solid bottom border
+    textTransform: "uppercase", 
+    paddingBottom: "0.3rem", 
+    borderBottom: "4px solid #0074D9", 
   };
 
   return (

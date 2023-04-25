@@ -45,6 +45,7 @@ const Player = () => {
     }, 50),
     [seasons]
   );
+  
   //useEffect with empty dependency array gets the API call to run initially
   useEffect(() => {
     const fetchData = async () => {
@@ -103,15 +104,15 @@ const Player = () => {
     fontSize: "2rem",
     textAlign: "center",
     margin: "2rem 0",
-    background: "linear-gradient(to right, #003459, #0074D9)", // Updated gradient colors
+    background: "linear-gradient(to right, #003459, #0074D9)", 
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     fontFamily: "monospace",
     fontWeight: 700,
     letterSpacing: ".3rem",
-    textTransform: "uppercase", // Added text transformation
-    paddingBottom: "0.3rem", // Added padding to the bottom
-    borderBottom: "4px solid #0074D9", // Added a solid bottom border
+    textTransform: "uppercase", 
+    paddingBottom: "0.3rem", 
+    borderBottom: "4px solid #0074D9", 
   };
 
   const chartOptions = {
