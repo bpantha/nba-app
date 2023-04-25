@@ -108,12 +108,18 @@ const Game = () => {
   }, [seasons]);
 
   const h1Style = {
-    marginRight: "30px",
+    fontSize: "3rem",
+    textAlign: "center",
+    margin: "2rem 0",
+    background: "linear-gradient(to right, #003459, #0074D9)", // Updated gradient colors
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
     fontFamily: "monospace",
     fontWeight: 700,
     letterSpacing: ".3rem",
-    textAlign: "center",
-    color: "#2E4A62",
+    textTransform: "uppercase", // Added text transformation
+    paddingBottom: "0.3rem", // Added padding to the bottom
+    borderBottom: "4px solid #0074D9", // Added a solid bottom border
   };
 
   const handleTeamChange = (e, teamIndex) => {
@@ -161,26 +167,26 @@ const Game = () => {
   ];
 
   const columnMapping = {
-    "year_id": "Year",
-    "date_game": "Game Date",
-    "is_playoffs": "Is Playoffs",
-    "fran_id": "Team",
-    "pts": "Points",
-    "elo_i": "Elo Initial",
-    "elo_n": "Elo New",
-    "win_equiv": "Win Equiv",
-    "opp_id": "Opponent ID",
-    "opp_pts": "Opponent Points",
-    "opp_elo_i": "Opponent Elo Initial",
-    "opp_elo_n": "Opponent Elo New",
-    "game_location": "Game Location",
-    "game_result": "Game Result",
-    "forecast": "Forecast",
-    "notes": "Notes",
-    "total_pts": "Total Points",
-    "pts_diff": "Points Difference",
-    "avg_elo": "Average Elo",
-    "elo_diff": "Elo Difference",
+    year_id: "Year",
+    date_game: "Game Date",
+    is_playoffs: "Is Playoffs",
+    fran_id: "Team",
+    pts: "Points",
+    elo_i: "Elo Initial",
+    elo_n: "Elo New",
+    win_equiv: "Win Equiv",
+    opp_id: "Opponent ID",
+    opp_pts: "Opponent Points",
+    opp_elo_i: "Opponent Elo Initial",
+    opp_elo_n: "Opponent Elo New",
+    game_location: "Game Location",
+    game_result: "Game Result",
+    forecast: "Forecast",
+    notes: "Notes",
+    total_pts: "Total Points",
+    pts_diff: "Points Difference",
+    avg_elo: "Average Elo",
+    elo_diff: "Elo Difference",
   };
 
   const renamedSearchResults = searchResults.map((row) => {
@@ -210,25 +216,25 @@ const Game = () => {
     "game_result",
     "forecast",
   ];
-  
+
   const topUpsetsColumnMapping = {
-    "year_id": "Year",
-    "date_game": "Game Date",
-    "is_playoffs": "Is Playoffs",
-    "fran_id": "Franchise ID",
-    "pts": "Points",
-    "elo_i": "Elo Initial",
-    "elo_n": "Elo New",
-    "win_equiv": "Win Equiv",
-    "opp_id": "Opponent ID",
-    "opp_pts": "Opponent Points",
-    "opp_elo_i": "Opponent Elo Initial",
-    "opp_elo_n": "Opponent Elo New",
-    "game_location": "Game Location",
-    "game_result": "Game Result",
-    "forecast": "Forecast",
+    year_id: "Year",
+    date_game: "Game Date",
+    is_playoffs: "Is Playoffs",
+    fran_id: "Franchise ID",
+    pts: "Points",
+    elo_i: "Elo Initial",
+    elo_n: "Elo New",
+    win_equiv: "Win Equiv",
+    opp_id: "Opponent ID",
+    opp_pts: "Opponent Points",
+    opp_elo_i: "Opponent Elo Initial",
+    opp_elo_n: "Opponent Elo New",
+    game_location: "Game Location",
+    game_result: "Game Result",
+    forecast: "Forecast",
   };
-  
+
   const filterAndRenameTopUpsetsColumns = (data) => {
     return data.map((row) => {
       const newRow = {};
@@ -242,7 +248,6 @@ const Game = () => {
   };
 
   const renamedTopUpsets = filterAndRenameTopUpsetsColumns(topUpsets);
-  
 
   const filteredResults = searchResults.map((result) => {
     return Object.keys(result)
@@ -257,18 +262,7 @@ const Game = () => {
 
   return (
     <div>
-      <h1
-        style={{
-          fontSize: "3rem",
-          textAlign: "center",
-          margin: "2rem 0",
-          background: "linear-gradient(to right, #0074D9, #7FDBFF)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        Games
-      </h1>
+      <h1 style={h1Style}>Games</h1>
       <div
         style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
       >
