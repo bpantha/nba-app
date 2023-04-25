@@ -111,7 +111,7 @@ const player_stats = async function (req, res) {
     console.log(seasonsCondition);
 
   query = `
-  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.team
+  SELECT DISTINCT s.pts, s.reb, s.ast, p.country, p.college, s.season, s.gp, s.mp
   FROM Players p JOIN Seasons s on p.player_id = s.player_id
   WHERE ${seasonsCondition} player_name = '${player_name}'`;
 
@@ -324,32 +324,45 @@ const game = async function (req, res) {
 };
 
 // Route 7: GET /upsets/:season?
-const upsets = async function(req, res) {
-  // const season = req.query.season;
-  const seasonsParam = req.params.season;
-  let allSeasonsToggle = false;
-  if (seasonsParam.length > 4) {
-    allSeasonsToggle = true;
-  }
+const upsets = async function (req, res) {
+  const season = req.query.season;
 
-  const seasonsCondition = allSeasonsToggle 
-  ? 'TRUE'
-  : seasonsParam
-  ? `g.year_id = ${seasonsParam}`
-  : `g.year_id = (SELECT MAX(year_id) FROM Games)`;
-
-  connection.query(`
-   SELECT *
+  if (!season) {
+    connection.query(
+      `
+    SELECT *
     FROM Games g
-    WHERE ${seasonsCondition} and g.game_result = 'W'
-     ORDER BY g.forecast ASC
-     LIMIT 50`, (err, data) => {
-    if (err || data.length === 0) {
-      console.log(err);
-      res.json({});
-    } else {
-      res.json(data)};})
-}
+    WHERE g.game_result = 'W'
+    ORDER BY g.forecast ASC
+    LIMIT 50`,
+      (err, data) => {
+        if (err || data.length === 0) {
+          console.log(err);
+          res.json({});
+        } else {
+          res.json(data);
+        }
+      }
+    );
+  } else {
+    connection.query(
+      `
+    SELECT *
+    FROM Games g
+    WHERE g.year_id = '${season}' and g.game_result = 'W'
+    ORDER BY g.forecast ASC
+    LIMIT 50`,
+      (err, data) => {
+        if (err || data.length === 0) {
+          console.log(err);
+          res.json({});
+        } else {
+          res.json(data);
+        }
+      }
+    );
+  }
+};
 
 // Route 12: GET /award
 const award = async function (req, res) {
@@ -696,5 +709,4 @@ module.exports = {
   teams,
   roster
 };
-
 
