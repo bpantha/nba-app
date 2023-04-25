@@ -693,6 +693,66 @@ order by max_elo DESC`;
   });
 };
 
+// Route 5: GET /search_games
+const search_games = async function (req, res) {
+  
+
+  const seasonsParam = req.params.season;
+  let allSeasonsToggle = false;
+  if (seasonsParam.length > 4) {
+    allSeasonsToggle = true;
+  }
+
+  const seasonsCondition = allSeasonsToggle
+    ? "TRUE"
+    : seasonsParam
+    ? `g.year_id = ${seasonsParam}`
+    : `g.year_id = (SELECT MAX(year_id) FROM Games)`;
+
+  const team1Param = req.params.team1;
+  let allteam1sToggle = false;
+  if (team1Param == 'ALL') {
+    allteam1sToggle = true;
+  }
+
+  const team1Condition = allteam1sToggle
+    ? "TRUE"
+    :  `g.team_id = '${team1Param}'`;
+
+  const team2Param = req.params.team2;
+  let allteam2sToggle = false;
+  if (team2Param == 'ALL') {
+    allteam2sToggle = true;
+  }
+  
+  const team2Condition = allteam2sToggle
+      ? "TRUE"
+      :  `g.opp_id = '${team2Param}'`;
+
+  const sortParam = req.params.sort;
+  const sortOrder = req.params.sortOrder;
+  
+  connection.query(
+    `WITH games_temp (game_id, total_pts, pts_diff, avg_elo, elo_diff) AS (
+      SELECT game_id, pts+opp_pts, pts-opp_pts, (elo_i+opp_elo_i)/2, elo_i-opp_elo_i
+      FROM Games g
+    )
+    SELECT *
+    FROM Games g NATURAL JOIN games_temp
+    WHERE ${seasonsCondition} and ${team1Condition} and ${team2Condition}
+    ORDER BY ${sortParam} ${sortOrder}`,
+    (err, data) => {
+      if (err || data.length === 0) {
+        console.log(err);
+        res.json({});
+      } else {
+        res.json(data);
+      }
+    }
+  );
+};
+
+
 module.exports = {
   authors,
   player,
@@ -707,7 +767,8 @@ module.exports = {
   draft_bad,
   teamwork,
   teams,
-  roster
+  roster,
+  search_games
 };
 
 
