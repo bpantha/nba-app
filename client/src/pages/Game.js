@@ -182,7 +182,6 @@ const Game = () => {
     game_location: "Game Location",
     game_result: "Game Result",
     forecast: "Forecast",
-    notes: "Notes",
     total_pts: "Total Points",
     pts_diff: "Points Difference",
     avg_elo: "Average Elo",
@@ -296,6 +295,9 @@ const Game = () => {
           <option value="">Sort by</option>
           {/* Add sort options here */}
           <option value="total_pts">Total Points</option>
+          <option value="avg_elo">Average Elo</option>
+          <option value="forecast">Forecast</option>
+
         </select>
 
         <select onChange={handleSortOrderChange} style={selectStyle}>
