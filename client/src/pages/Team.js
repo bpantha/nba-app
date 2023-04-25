@@ -15,7 +15,7 @@ const Team = () => {
     debounce((newSelectedSeason) => {
       setSeasons(newSelectedSeason);
     }, 50),
-    []
+    [seasons]
   );
 
   useEffect(() => {
@@ -27,6 +27,11 @@ const Team = () => {
         .then((resJson) => setAwardByTeam(resJson));
     };
 
+    fetchAwardsByTeam();
+    
+  }, []);
+
+  useEffect(() => {
     const fetchTeamworkData = async () => {
       fetch(
         `http://${config.server_host}:${config.server_port}/teamwork/${season}`
@@ -34,8 +39,6 @@ const Team = () => {
         .then((res) => res.json())
         .then((resJson) => setTeamworkData(resJson));
     };
-
-    fetchAwardsByTeam();
     fetchTeamworkData();
   }, [season]);
 
@@ -48,12 +51,15 @@ const Team = () => {
     color: "#2E4A62",
   };
 
+  //console.log(season);
+
   return (
     <div>
       <SeasonSelect
         onSeasonsChange={handleSeasonsChange}
         value={seasons}
         setValue={setSeasons}
+        max={[2022]}
       />
       <h1 style={h1Style}>Awards By Team</h1>
       <LazyTable data={awardByTeam} seasons={seasons} />
