@@ -29,6 +29,7 @@ export function LazyTable({
 }) {
   // get the keys and store in columns array
   const columns = data?.[0] ? Object.keys(data[0]) : [];
+  // console.log("LAZY TABLE DATA", data);
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(defaultPageSize ?? 5);
@@ -82,6 +83,10 @@ export function LazyTable({
     }
 
     return <TableCell {...award}>{content}</TableCell>;
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return <p>No data available</p>;
   }
 
   if (seasons) {

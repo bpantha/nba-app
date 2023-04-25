@@ -5,6 +5,7 @@ import { createTheme } from "@mui/material/styles";
 import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
 import Player from "./pages/Player";
+import Game from "./pages/Game";
 // import HomePage from "./pages/HomePage";
 // import AlbumsPage from "./pages/AlbumsPage";
 // import SongsPage from "./pages/SongsPage";
@@ -32,6 +33,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/player" element={<Player />} />
+          <Route path="/games" element={<Game />} />
           {/* <Route path="/teams" element={<AlbumsPage />} /> */}
           {/* <Route path="/albums/:album_id" element={<AlbumInfoPage />} /> */}
           {/* <Route path="/songs" element={<SongsPage />} /> */}
