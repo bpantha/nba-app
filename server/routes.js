@@ -710,36 +710,43 @@ const search_games = async function (req, res) {
     : `g.year_id = (SELECT MAX(year_id) FROM Games)`;
 
   const team1Param = req.params.team1;
-  let allteam1sToggle = false;
+  let allTeam1sToggle = false;
   if (team1Param == 'ALL') {
-    allteam1sToggle = true;
+    allTeam1sToggle = true;
   }
 
-  const team1Condition = allteam1sToggle
+  const team1Condition = allTeam1sToggle
     ? "TRUE"
     :  `g.team_id = '${team1Param}'`;
 
   const team2Param = req.params.team2;
-  let allteam2sToggle = false;
+  let allTeam2sToggle = false;
   if (team2Param == 'ALL') {
-    allteam2sToggle = true;
+    allTeam2sToggle = true;
   }
   
-  const team2Condition = allteam2sToggle
+  const team2Condition = allTeam2sToggle
       ? "TRUE"
       :  `g.opp_id = '${team2Param}'`;
 
+  
+  const resultsParam = req.params.result;
+  let allResultsToggle = false;
+  if (resultsParam == 'ALL') {
+    allResultsToggle = true;
+    }
+      
+  const resultCondition = allResultsToggle
+      ? "TRUE"
+      :  `g.game_result = '${resultsParam}'`;    
+      
   const sortParam = req.params.sort;
   const sortOrder = req.params.sortOrder;
   
   connection.query(
-    `WITH games_temp (game_id, total_pts, pts_diff, avg_elo, elo_diff) AS (
-      SELECT game_id, pts+opp_pts, pts-opp_pts, (elo_i+opp_elo_i)/2, elo_i-opp_elo_i
-      FROM Games g
-    )
-    SELECT *
-    FROM Games g NATURAL JOIN games_temp
-    WHERE ${seasonsCondition} and ${team1Condition} and ${team2Condition}
+    `SELECT g.*, pts+opp_pts as total_pts, pts-opp_pts as pts_diff, (elo_i+opp_elo_i)/2 as avg_elo, elo_i-opp_elo_i as elo_diff
+    FROM Games g
+    WHERE ${seasonsCondition} and ${team1Condition} and ${team2Condition} and ${resultCondition}
     ORDER BY ${sortParam} ${sortOrder}`,
     (err, data) => {
       if (err || data.length === 0) {
