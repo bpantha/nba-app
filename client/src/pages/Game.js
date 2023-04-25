@@ -138,8 +138,6 @@ const Game = () => {
   // searchResults
   // topUpsets
   const keysToKeep = [
-    "lg_id",
-    "is_copy",
     "year_id",
     "date_game",
     "is_playoffs",
@@ -156,12 +154,44 @@ const Game = () => {
     "game_location",
     "game_result",
     "forecast",
-    "notes",
     "total_pts",
     "pts_diff",
     "avg_elo",
     "elo_diff",
   ];
+
+  const columnMapping = {
+    "year_id": "Year",
+    "date_game": "Game Date",
+    "is_playoffs": "Is Playoffs",
+    "fran_id": "Team",
+    "pts": "Points",
+    "elo_i": "Elo Initial",
+    "elo_n": "Elo New",
+    "win_equiv": "Win Equiv",
+    "opp_id": "Opponent ID",
+    "opp_pts": "Opponent Points",
+    "opp_elo_i": "Opponent Elo Initial",
+    "opp_elo_n": "Opponent Elo New",
+    "game_location": "Game Location",
+    "game_result": "Game Result",
+    "forecast": "Forecast",
+    "notes": "Notes",
+    "total_pts": "Total Points",
+    "pts_diff": "Points Difference",
+    "avg_elo": "Average Elo",
+    "elo_diff": "Elo Difference",
+  };
+
+  const renamedSearchResults = searchResults.map((row) => {
+    const renamedRow = {};
+    for (const key in row) {
+      if (columnMapping[key]) {
+        renamedRow[columnMapping[key]] = row[key];
+      }
+    }
+    return renamedRow;
+  });
 
   const filteredResults = searchResults.map((result) => {
     return Object.keys(result)
@@ -234,7 +264,7 @@ const Game = () => {
         </select>
       </div>
       <h1 style={h1Style}>Search Results</h1>
-      <LazyTable data={filteredResults} seasons={seasons} />
+      <LazyTable data={renamedSearchResults} seasons={seasons} />
       <h1 style={h1Style}>Top Upsets</h1>
       <LazyTable data={topUpsets} seasons={seasons} />
     </div>
