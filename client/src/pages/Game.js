@@ -314,9 +314,9 @@ const Game = () => {
           <option value="L">Losses</option>
         </select>
       </div>
-      <h1 style={h1Style}>Search Results</h1>
+      <h1 style={h1Style}>Search For Games</h1>
       <LazyTable data={renamedSearchResults} seasons={seasons} />
-      <h1 style={h1Style}>Top Upsets</h1>
+      <h1 style={h1Style}>Top Upsets By Season</h1>
       <LazyTable data={renamedTopUpsets} seasons={seasons} />
     </div>
   );
