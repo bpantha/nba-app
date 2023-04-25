@@ -68,11 +68,15 @@ const Game = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (team1 && team2 && sort) {
-        fetch(
-          `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
-        )
-          .then((res) => res.json())
-          .then((resJson) => setSearchResults(resJson));
+        if (team1 === team2) {
+          setSearchResults([]); // Clear the search results if both teams are the same
+        } else {
+          fetch(
+            `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
+          )
+            .then((res) => res.json())
+            .then((resJson) => setSearchResults(resJson));
+        }
       } else {
         setSearchResults([]); // Clear the search results if the conditions are not met
       }
@@ -133,7 +137,31 @@ const Game = () => {
 
   // searchResults
   // topUpsets
-  const keysToKeep = ["year_id"];
+  const keysToKeep = [
+    "lg_id",
+    "is_copy",
+    "year_id",
+    "date_game",
+    "is_playoffs",
+    "team_id",
+    "fran_id",
+    "pts",
+    "elo_i",
+    "elo_n",
+    "win_equiv",
+    "opp_id",
+    "opp_pts",
+    "opp_elo_i",
+    "opp_elo_n",
+    "game_location",
+    "game_result",
+    "forecast",
+    "notes",
+    "total_pts",
+    "pts_diff",
+    "avg_elo",
+    "elo_diff",
+  ];
 
   const filteredResults = searchResults.map((result) => {
     return Object.keys(result)
