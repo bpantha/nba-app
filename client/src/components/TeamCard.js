@@ -163,11 +163,15 @@ export function TeamCard({ team, seasons, setSeasons, open, onClose }) {
             value={seasons}
             setValue={setSeasons}
           />
-          {teamRoster && (
-            <RosterTable
-              data={teamRoster}
-            />
-          )}
+        {teamRoster ? (
+          teamRoster.length > 0 ? (
+            <RosterTable data={teamRoster} />
+          ) : (
+            <p>No data available for the selected season.</p>
+          )
+        ) : (
+          <p>Loading...</p>
+        )}
         </Box>
       </Modal>
     </>
