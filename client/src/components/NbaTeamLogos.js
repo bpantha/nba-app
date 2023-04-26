@@ -82,7 +82,6 @@ export function NbaTeamLogos({ teams, seasons, onTeamClick }) {
                     >
                       <button onClick={() => {
                         onTeamClick(team);
-                        console.log(team);
                         }}>
                         {LogoComponent && <LogoComponent />}
                       </button>

@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { SeasonSelect } from "../components/SeasonSelect";
 import { LazyTable } from "../components/LazyTable";
-import { debounce, sortBy } from "lodash";
+import { debounce } from "lodash";
+
 const config = require("../config.json");
 
 const Game = () => {
@@ -51,7 +52,6 @@ const Game = () => {
       )
         .then((res) => res.json())
         .then((resJson) => {
-          console.log("Teams data:", resJson);
           setTeams(resJson);
         });
     };
@@ -69,7 +69,6 @@ const Game = () => {
       )
         .then((res) => res.json())
         .then((resJson) => {
-          console.log("Top Upsets data:", resJson);
           setTopUpsets(resJson);
         });
     };
@@ -85,7 +84,13 @@ const Game = () => {
           `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
         )
           .then((res) => res.json())
-          .then((resJson) => setSearchResults(resJson));
+          .then((resJson) => {
+            if (resJson === null) {
+              setSearchResults([]);
+            } else {
+              setSearchResults(resJson);
+            }
+          });
       }
     } else {
       setSearchResults([]);
@@ -100,7 +105,7 @@ const Game = () => {
       fontSize: "1rem",
       fontFamily: "monospace",
     };
-  
+
     if (value) {
       return {
         ...baseStyle,
@@ -115,27 +120,12 @@ const Game = () => {
       };
     }
   };
-  
-  
 
   useEffect(() => {
     const fetchData = async () => {
       fetch(
         `http://${config.server_host}:${config.server_port}/upsets/${seasons}`
-      )
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`HTTP error ${res.status}`);
-          }
-          return res.json();
-        })
-        .then((resJson) => {
-          console.log("Top Upsets data:", resJson);
-          setTopUpsets(resJson);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+      );
     };
     fetchData();
   }, [seasons]);
@@ -155,7 +145,7 @@ const Game = () => {
     borderBottom: "4px solid #0074D9",
   };
 
-  const roundToTwoDecimalPlaces = (num) => {
+  const rounding = (num) => {
     return parseFloat(num.toFixed(2));
   };
 
@@ -175,30 +165,7 @@ const Game = () => {
     setSortOrder(e.target.value);
   };
 
-  const keysToKeep = [
-    "year_id",
-    "date_game",
-    "is_playoffs",
-    "team_id",
-    "fran_id",
-    "pts",
-    "elo_i",
-    "elo_n",
-    "win_equiv",
-    "opp_id",
-    "opp_pts",
-    "opp_elo_i",
-    "opp_elo_n",
-    "game_location",
-    "game_result",
-    "forecast",
-    "total_pts",
-    "pts_diff",
-    "avg_elo",
-    "elo_diff",
-  ];
-
-  const columnMapping = {
+  const columnNameChanges = {
     year_id: "Year",
     date_game: "Game Date",
     is_playoffs: "Is Playoffs",
@@ -220,20 +187,20 @@ const Game = () => {
     elo_diff: "Elo Difference",
   };
 
-  const renamedSearchResults = searchResults.map((row) => {
-    const renamedRow = {};
-    for (const key in row) {
-      if (columnMapping[key]) {
-        renamedRow[columnMapping[key]] =
-          typeof row[key] === "number"
-            ? roundToTwoDecimalPlaces(row[key])
-            : row[key];
+  const renamedSearchResults =
+    Array.isArray(searchResults) &&
+    searchResults.map((row) => {
+      const renamedRow = {};
+      for (const key in row) {
+        if (columnNameChanges[key]) {
+          renamedRow[columnNameChanges[key]] =
+            typeof row[key] === "number" ? rounding(row[key]) : row[key];
+        }
       }
-    }
-    return renamedRow;
-  });
+      return renamedRow;
+    });
 
-  const topUpsetsKeysToKeep = [
+  const topUpsetsdesiredKeys = [
     "year_id",
     "date_game",
     "is_playoffs",
@@ -251,7 +218,7 @@ const Game = () => {
     "forecast",
   ];
 
-  const topUpsetsColumnMapping = {
+  const topUpsetscolumnNameChanges = {
     year_id: "Year",
     date_game: "Game Date",
     is_playoffs: "Is Playoffs",
@@ -270,32 +237,24 @@ const Game = () => {
   };
 
   const filterAndRenameTopUpsetsColumns = (data) => {
-    return data.map((row) => {
-      const newRow = {};
-      for (const key in row) {
-        if (topUpsetsKeysToKeep.includes(key) && topUpsetsColumnMapping[key]) {
-          newRow[topUpsetsColumnMapping[key]] =
-            typeof row[key] === "number"
-              ? roundToTwoDecimalPlaces(row[key])
-              : row[key];
+    if (data === null) {
+      return "No Data Available";
+    } else {
+      return data.map((row) => {
+        const aRow = {};
+        for (const key in row) {
+          if (
+            topUpsetsdesiredKeys.includes(key) &&
+            topUpsetscolumnNameChanges[key]
+          ) {
+            aRow[topUpsetscolumnNameChanges[key]] =
+              typeof row[key] === "number" ? rounding(row[key]) : row[key];
+          }
         }
-      }
-      return newRow;
-    });
+        return aRow;
+      });
+    }
   };
-
-  const renamedTopUpsets = filterAndRenameTopUpsetsColumns(topUpsets);
-
-  const filteredResults = searchResults.map((result) => {
-    return Object.keys(result)
-      .filter((key) => keysToKeep.includes(key))
-      .reduce((acc, key) => {
-        acc[key] = result[key];
-        return acc;
-      }, {});
-  });
-
-  console.log(filteredResults);
 
   return (
     <div>
@@ -311,7 +270,10 @@ const Game = () => {
       <div
         style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
       >
-        <select onChange={(e) => handleTeamChange(e, 1)} style={getSelectStyle(team1)}>
+        <select
+          onChange={(e) => handleTeamChange(e, 1)}
+          style={getSelectStyle(team1)}
+        >
           <option value="">Select Team 1</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
@@ -319,7 +281,10 @@ const Game = () => {
             </option>
           ))}
         </select>
-        <select onChange={(e) => handleTeamChange(e, 2)} style={getSelectStyle(team2)}>
+        <select
+          onChange={(e) => handleTeamChange(e, 2)}
+          style={getSelectStyle(team2)}
+        >
           <option value="">Select Team 2</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
@@ -327,14 +292,12 @@ const Game = () => {
             </option>
           ))}
         </select>
-
         <select onChange={handleSortChange} style={getSelectStyle(sort)}>
           <option value="">Sort by</option>
           <option value="total_pts">Total Points</option>
           <option value="avg_elo">Average Elo</option>
           <option value="forecast">Forecast</option>
         </select>
-
         <select onChange={handleSortOrderChange} style={selectStyle}>
           <option value="ASC">Ascending</option>
           <option value="DESC">Descending</option>
@@ -345,30 +308,30 @@ const Game = () => {
           <option value="L">Losses</option>
         </select>
         <button
-        onClick={handleSearchClick}
-        disabled={!canSearch}
-        style={{
-          ...selectStyle,
-          cursor: canSearch ? 'pointer' : 'not-allowed',
-          backgroundColor: canSearch ? '#0074D9' : '#9aa3ac',
-          color: 'white',
-          fontWeight: 'bold',
-        }}
-      >
-        Search
-      </button>
+          onClick={handleSearchClick}
+          disabled={!canSearch}
+          style={{
+            ...selectStyle,
+            cursor: canSearch ? "pointer" : "not-allowed",
+            backgroundColor: canSearch ? "#0074D9" : "#9aa3ac",
+            color: "white",
+            fontWeight: "bold",
+          }}
+        >
+          Search
+        </button>
       </div>
       <h1 style={h1Style}>Search Results</h1>
       <LazyTable
         data={renamedSearchResults}
         seasons={seasons}
-        roundToTwoDecimalPlaces={roundToTwoDecimalPlaces}
+        rounding={rounding}
       />
       <h1 style={h1Style}>Top Upsets In {seasons}</h1>
       <LazyTable
         data={filterAndRenameTopUpsetsColumns(topUpsets)}
         seasons={seasons}
-        roundToTwoDecimalPlaces={roundToTwoDecimalPlaces}
+        rounding={rounding}
       />
     </div>
   );
