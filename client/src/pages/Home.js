@@ -1,15 +1,28 @@
-import { useState, useCallback, useEffect } from "react";
-import { NbaTeamLogos } from "../components/NbaTeamLogos";
-import { SeasonSelect } from "../components/SeasonSelect";
-import { debounce } from "lodash";
-const config = require("../config.json");
+import { useState, useCallback, useEffect } from 'react';
+import { NbaTeamLogos } from '../components/NbaTeamLogos';
+import { SeasonSelect } from '../components/SeasonSelect';
+import { TeamCard } from '../components/TeamCard';
+import { debounce } from 'lodash';
+const config = require('../config.json');
 
 const Home = () => {
   const [teams, setTeams] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
+  const [seasons2, setSeasons2] = useState([2022]);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  //linter warning, not a big deal
-  //use debounce function to buffer the http requests from the slider
+  const handleTeamClick = (team) => {
+    setSelectedTeam(team);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedTeam(null);
+  }
+
+
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
       setSeasons(newSelectedSeason);
@@ -25,7 +38,7 @@ const Home = () => {
     }, 50),
     [seasons]
   );
-  //useEffect with empty dependency array gets the API call to run initially
+
   useEffect(() => {
     const fetchData = async () => {
       fetch(
@@ -44,7 +57,21 @@ const Home = () => {
         value={seasons}
         setValue={setSeasons}
       />
-      <NbaTeamLogos teams={teams} seasons={seasons} />;
+      <NbaTeamLogos 
+      teams={teams} 
+      seasons={seasons} 
+      onTeamClick={handleTeamClick}
+       />
+
+      {selectedTeam && (
+        <TeamCard
+          team={selectedTeam}
+          seasons={seasons2}
+          setSeasons={setSeasons2}
+          open={modalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 };

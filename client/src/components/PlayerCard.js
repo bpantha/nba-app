@@ -20,8 +20,6 @@ export function PlayerCard({ player }) {
   const [playerStats, setPlayerStats] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
 
-  console.log(seasons);
-  console.log(playerStats);
 
   const handleFetchPlayerStats = useCallback(
     debounce((seasons) => {
