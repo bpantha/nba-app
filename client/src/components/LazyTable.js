@@ -19,8 +19,6 @@ const mip = require("../images/mip.png");
 const roy = require("../images/roy.jpeg");
 const smoy = require("../images/smoy.jpeg");
 
-// LazyTable is paginated and takes in data prop which is a json object and maps keys to columns and values to row
-
 export function LazyTable({
   data,
   seasons,

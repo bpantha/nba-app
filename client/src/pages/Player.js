@@ -1,21 +1,10 @@
 import React from "react";
-// import { Bar } from "react-chartjs-2";
 import { useState, useCallback, useEffect } from "react";
 import { SeasonSelect } from "../components/SeasonSelect";
 import { h1Style } from "./Team";
 
 import { LazyTable } from "../components/LazyTable";
-// import { BarChart } from "../components/BarChart";
 import { debounce } from "lodash";
-// import {
-//   Chart as ChartJS,
-//   BarElement,
-//   CategoryScale,
-//   LinearScale,
-//   Tooltip,
-//   Legend,
-// } from "chart.js";
-// ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const config = require("../config.json");
 
