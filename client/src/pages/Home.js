@@ -8,6 +8,7 @@ const config = require('../config.json');
 const Home = () => {
   const [teams, setTeams] = useState([]);
   const [seasons, setSeasons] = useState([2022]);
+  const [seasons2, setSeasons2] = useState([2022]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -63,12 +64,13 @@ const Home = () => {
        />
 
       {selectedTeam && (
-        <TeamCard 
-        team={selectedTeam} 
-        seasons={seasons} 
-        setSeasons={setSeasons} 
-        open={modalOpen} 
-        onClose={handleCloseModal} />
+        <TeamCard
+          team={selectedTeam}
+          seasons={seasons2}
+          setSeasons={setSeasons2}
+          open={modalOpen}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );
