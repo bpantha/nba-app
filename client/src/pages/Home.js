@@ -1,3 +1,5 @@
+import { h1Style } from "./Team";
+
 import { useState, useCallback, useEffect } from "react";
 import { NbaTeamLogos } from "../components/NbaTeamLogos";
 import { SeasonSelect } from "../components/SeasonSelect";

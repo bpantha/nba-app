@@ -5,6 +5,21 @@ import { LazyTable } from "../components/LazyTable";
 import { debounce } from "lodash";
 const config = require("../config.json");
 
+export const h1Style = {
+  fontSize: "3rem",
+  textAlign: "center",
+  margin: "2rem 0",
+  background: "linear-gradient(to right, #003459, #0074D9)", 
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  fontFamily: "monospace",
+  fontWeight: 700,
+  letterSpacing: ".3rem",
+  textTransform: "uppercase", 
+  paddingBottom: "0.3rem", 
+  borderBottom: "4px solid #0074D9", 
+};
+
 const Team = () => {
   const { season } = useParams();
   const [seasons, setSeasons] = useState([2015]);
@@ -17,6 +32,7 @@ const Team = () => {
     }, 50),
     [seasons]
   );
+  
 
   useEffect(() => {
     const fetchAwardsByTeam = async () => {
@@ -40,20 +56,7 @@ const Team = () => {
     fetchTeamworkData();
   }, [seasons]);
 
-  const h1Style = {
-    fontSize: "3rem",
-    textAlign: "center",
-    margin: "2rem 0",
-    background: "linear-gradient(to right, #003459, #0074D9)", 
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    fontFamily: "monospace",
-    fontWeight: 700,
-    letterSpacing: ".3rem",
-    textTransform: "uppercase", 
-    paddingBottom: "0.3rem", 
-    borderBottom: "4px solid #0074D9", 
-  };
+
 
   return (
     <div>

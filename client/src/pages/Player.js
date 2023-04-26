@@ -2,6 +2,8 @@ import React from "react";
 // import { Bar } from "react-chartjs-2";
 import { useState, useCallback, useEffect } from "react";
 import { SeasonSelect } from "../components/SeasonSelect";
+import { h1Style } from "./Team";
+
 import { LazyTable } from "../components/LazyTable";
 // import { BarChart } from "../components/BarChart";
 import { debounce } from "lodash";
@@ -76,14 +78,6 @@ const Player = () => {
 
   const firstTenEntries = filteredData.slice(0, 10);
 
-  const h1Style = {
-    marginRight: "30px",
-    fontFamily: "monospace",
-    fontWeight: 700,
-    letterSpacing: ".3rem",
-    textAlign: "center",
-    color: "#2E4A62",
-  };
   const labels = firstTenEntries.map((item) => item.player_name);
   const values = firstTenEntries.map((item) => item.war_total);
 
@@ -130,14 +124,22 @@ const Player = () => {
   };
   return (
     <div>
-      <header style={headerStyle}>
-        <h1>Players</h1>
-      </header>
+
       <SeasonSelect
         onSeasonsChange={handleSeasonsChange}
         value={seasons}
         setValue={setSeasons}
+        style={{
+          margin: "0.5rem",
+          padding: "0.5rem",
+          borderRadius: "4px",
+          border: "1px solid #2E4A62",
+          fontSize: "1rem",
+          fontFamily: "monospace",
+        }}
       />
+      <h1 style={h1Style}>PLAYERS</h1>
+
       <h1 style={headerStyle}>Award Winners in {seasons}</h1>
       <LazyTable data={awardWinners} seasons={seasons} />
       <h1 style={headerStyle}>Best Players in {seasons}</h1>

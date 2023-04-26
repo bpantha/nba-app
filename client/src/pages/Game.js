@@ -263,7 +263,6 @@ const Game = () => {
 
   return (
     <div>
-      <h1 style={h1Style}>Games</h1>
       <SeasonSelect
         onSeasonsChange={handleSeasonsChange}
         value={seasons}
@@ -271,6 +270,8 @@ const Game = () => {
         style={selectStyle}
         max={2015}
       />
+      <h1 style={h1Style}>Games</h1>
+
       <div
         style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
       >
