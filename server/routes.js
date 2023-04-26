@@ -142,78 +142,23 @@ const player_stats = async function (req, res) {
 const roster = async function (req, res) {
   const team = req.params.team;
   const seasonsParam = req.params.season;
-  let allSeasonsToggle = false;
-  if (seasonsParam.length > 4) {
-    allSeasonsToggle = true;
-  }
 
   const seasonsCondition = seasonsParam
     ? `s.season = ${seasonsParam}`
     : `s.season = (SELECT MAX(season) FROM Seasons)`;
-
-  const page = req.query.page;
-
-  const pageSize = req.query.page_size ?? 10;
-
-  if (seasonsCondition == "TRUE") {
-    if (!page) {
-      connection.query(
-        `
-    WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
-    FROM Seasons s 
-    WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
-    Career AS (SELECT p.player_id, SUM(r.gp) as gp, SUM(r.mp) as mp, AVG(r.pts) as pts, AVG(r.reb) as reb, AVG(r.ast) as ast
-    FROM Players p INNER JOIN Roster r ON p.player_id = r.player_id
-    GROUP BY p.player_id)
-    SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
-    FROM Career c JOIN Players p on c.player_id = p.player_id
-    ORDER BY c.mp DESC`,
-        (err, data) => {
-          if (err || data.length === 0) {
-            console.log(err);
-            res.json({});
-          } else {
-            res.json(data);
-          }
-        }
-      );
-    } else {
-      const offset = pageSize * (page - 1);
-      if (page === 0) {
-        offset = 0;
-      }
-      connection.query(
-        `
-    WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
-      FROM Seasons s 
-      WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
-      Career AS (SELECT p.player_id, SUM(r.gp) as gp, SUM(r.mp) as mp, AVG(r.pts) as pts, AVG(r.reb) as reb, AVG(r.ast) as ast
-      FROM Players p NATURAL JOIN Roster r
-      GROUP BY p.player_id)
-      SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
-      FROM Career c JOIN Players p on c.player_id = p.player_id
-      ORDER BY c.mp DESC
-      LIMIT ${pageSize} OFFSET ${offset}`,
-        (err, data) => {
-          if (err || data.length === 0) {
-            console.log(err);
-            res.json({});
-          } else {
-            res.json(data);
-          }
-        }
-      );
-    }
-  } else {
-    connection.query(
-      `
+  const query =       `
   WITH Roster AS (SELECT s.player_id, s.mp, s.gp, s.pts, s.reb, s.ast
   FROM Seasons s 
-  WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS')
-  SELECT p.player_name, r.gp, r.mp, r.pts, r.reb, r.ast, p.player_height, p.player_weight, p.country, p.college
-  FROM Players p NATURAL JOIN Roster r
-  ORDER BY r.mp DESC`,
-      (err, data) => {
+  WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
+  Career AS (SELECT p.player_id, SUM(r.gp) as gp, SUM(r.mp) as mp, AVG(r.pts) as pts, AVG(r.reb) as reb, AVG(r.ast) as ast
+  FROM Players p INNER JOIN Roster r ON p.player_id = r.player_id
+  GROUP BY p.player_id)
+  SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
+  FROM Career c JOIN Players p on c.player_id = p.player_id
+  ORDER BY c.mp DESC`;
+
+
+  connection.query(query, (err, data) => {
         if (err || data.length === 0) {
           console.log(err);
           res.json({});
@@ -222,7 +167,6 @@ const roster = async function (req, res) {
         }
       }
     );
-  }
 };
 
 // Route 5: GET /best_players
@@ -258,55 +202,6 @@ const best_players = async function (req, res) {
     }
   );
 
-  //   if (!team) {
-  //     if (season) {
-  //     connection.query(`
-  //     SELECT p.player_name, s.team, s.season, s.raptor_total, s.raptor_offense, s.raptor_defense
-  //     FROM Seasons s join Players p on s.player_id = p.player_id
-  //     WHERE ${seasonsCondition} and s.gp > 40 and s.season_type = 'RS'
-  //     ORDER BY s.raptor_total DESC`, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json({});
-  //     } else {
-  //       res.json(data)}});
-  //   } else {
-  //     connection.query(`
-  //     SELECT p.player_name, s.team, s.season, s.raptor_total, s.raptor_offense, s.raptor_defense
-  //     FROM Seasons s join Players p on s.player_id = p.player_id
-  //     WHERE s.gp > 40 and s.season_type = 'RS'
-  //     ORDER BY s.raptor_total DESC`, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json({});
-  //     } else {
-  //       res.json(data)};})
-  //   }
-  // } else {
-  //     if (!season) {
-  //       connection.query(`
-  //         SELECT p.player_name, s.team, s.season, s.raptor_total, s.raptor_offense, s.raptor_defense
-  //         FROM Seasons s join Players p on s.player_id = p.player_id
-  //         WHERE s.team = '${team}' and s.gp > 40 and s.season_type = 'RS'
-  //         ORDER BY s.raptor_total DESC`, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json({});
-  //     } else {
-  //       res.json(data)}});
-  //   } else {
-  //       connection.query(`
-  //         SELECT p.player_name, s.team, s.season, s.raptor_total, s.raptor_offense, s.raptor_defense
-  //         FROM Seasons s join Players p on s.player_id = p.player_id
-  //         WHERE s.team = '${team}' and s.season = '${season}' and s.gp > 40 and s.season_type = 'RS'
-  //         ORDER BY s.raptor_total DESC`, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data)};})
-  // }
-  // }
 };
 
 // Route 4: GET /game/:game_id
@@ -396,8 +291,6 @@ const award = async function (req, res) {
 /************************
  * ADVANCED INFO ROUTES *
  ************************/
-
-// Route 7: GET /awards_by_team
 // Route 7: GET /awards_by_team
 const awards_by_team = async function (req, res) {
   const page = req.query.page;
@@ -465,84 +358,6 @@ const awards_by_team = async function (req, res) {
     );
   }
 };
-// const awards_by_team = async function (req, res) {
-//   const page = req.query.page;
-
-//   const pageSize = req.query.page_size ?? 10;
-
-//   if (!page) {
-//     connection.query(
-//       `SELECT
-//     Teams.fran_id,
-//     Seasons.season,
-//     COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
-//     COUNT(DISTINCT Games.game_id) AS total_wins,
-//     AVG(Games.elo_n) AS average_ELO
-// FROM
-//     Seasons
-//     JOIN Teams
-//         ON Seasons.team = Teams.team_id
-//     LEFT JOIN Awards
-//         ON Seasons.player_id = Awards.player_id
-//             AND Seasons.season = Awards.season
-//     LEFT JOIN Games
-//         ON Seasons.team = Games.team_id
-//             AND Seasons.season = Games.year_id
-//             AND Games.game_result = 'W'
-// WHERE year_id <=2015
-// GROUP BY
-//     Teams.fran_id,
-//     Seasons.season
-// ORDER BY total_awards DESC;`,
-//       (err, data) => {
-//         if (err || data.length === 0) {
-//           console.log(err);
-//           res.json({});
-//         } else {
-//           res.json(data);
-//         }
-//       }
-//     ); // replace this with your implementation
-//   } else {
-//     const offset = pageSize * (page - 1);
-//     if (page === 0) {
-//       offset = 0;
-//     }
-//     connection.query(
-//       `SELECT
-//     Teams.fran_id,
-//     Seasons.season,
-//     COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
-//     COUNT(DISTINCT Games.game_id) AS total_wins,
-//     AVG(Games.elo_n) AS average_ELO
-// FROM
-//     Seasons
-//     JOIN Teams
-//         ON Seasons.team = Teams.team_id
-//     LEFT JOIN Awards
-//         ON Seasons.player_id = Awards.player_id
-//             AND Seasons.season = Awards.season
-//     LEFT JOIN Games
-//         ON Seasons.team = Games.team_id
-//             AND Seasons.season = Games.year_id
-//             AND Games.game_result = 'W'
-// WHERE year_id <=2015
-// GROUP BY
-//     Teams.fran_id,
-//     Seasons.season
-// ORDER BY total_awards DESC;
-//       LIMIT ${pageSize} OFFSET ${offset}`,
-//       (err, data) => {
-//         if (err || data.length === 0) {
-//           console.log(err);
-//           res.json({});
-//         } else {
-//           res.json(data);
-//         }
-//       }
-//     ); // replace this with your implementation
-//   }
-// };
 
 // Route 8: GET /best_seasons_bad_teams
 const best_seasons_bad_teams = async function (req, res) {
