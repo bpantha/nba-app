@@ -43,7 +43,6 @@ const h1Style = {
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
   fontFamily: "monospace",
-  fontWeight: 700,
   letterSpacing: ".3rem",
   textTransform: "uppercase", // Added text transformation
   paddingBottom: "0.3rem", // Added padding to the bottom
