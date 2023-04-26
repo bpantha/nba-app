@@ -26,7 +26,6 @@ const Game = () => {
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
-      console.log("Selected season:", newSelectedSeason);
       setSeasons(newSelectedSeason);
     }, 50),
     []
@@ -50,7 +49,6 @@ const Game = () => {
     setGameOutcome(e.target.value);
   };
 
-  // Fetch teams based on the selected season
   useEffect(() => {
     const fetchData = async () => {
       fetch(
@@ -69,7 +67,7 @@ const Game = () => {
     const fetchData = async () => {
       if (team1 && team2 && sort) {
         if (team1 === team2) {
-          setSearchResults([]); // Clear the search results if both teams are the same
+          setSearchResults([]);
         } else {
           fetch(
             `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
@@ -78,13 +76,12 @@ const Game = () => {
             .then((resJson) => setSearchResults(resJson));
         }
       } else {
-        setSearchResults([]); // Clear the search results if the conditions are not met
+        setSearchResults([]);
       }
     };
     fetchData();
   }, [seasons, team1, team2, gameOutcome, sort, sortOrder]);
 
-  // Fetch top upsets
   useEffect(() => {
     const fetchData = async () => {
       fetch(
@@ -108,12 +105,22 @@ const Game = () => {
   }, [seasons]);
 
   const h1Style = {
-    marginRight: "30px",
+    fontSize: "3rem",
+    textAlign: "center",
+    margin: "2rem 0",
+    background: "linear-gradient(to right, #003459, #0074D9)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
     fontFamily: "monospace",
     fontWeight: 700,
     letterSpacing: ".3rem",
-    textAlign: "center",
-    color: "#2E4A62",
+    textTransform: "uppercase",
+    paddingBottom: "0.3rem",
+    borderBottom: "4px solid #0074D9",
+  };
+
+  const roundToTwoDecimalPlaces = (num) => {
+    return parseFloat(num.toFixed(2));
   };
 
   const handleTeamChange = (e, teamIndex) => {
@@ -124,9 +131,6 @@ const Game = () => {
     }
   };
 
-  console.log(team1);
-  console.log(team2);
-
   const handleSortChange = (e) => {
     setSort(e.target.value);
   };
@@ -135,11 +139,7 @@ const Game = () => {
     setSortOrder(e.target.value);
   };
 
-  // searchResults
-  // topUpsets
   const keysToKeep = [
-    "lg_id",
-    "is_copy",
     "year_id",
     "date_game",
     "is_playoffs",
@@ -156,12 +156,99 @@ const Game = () => {
     "game_location",
     "game_result",
     "forecast",
-    "notes",
     "total_pts",
     "pts_diff",
     "avg_elo",
     "elo_diff",
   ];
+
+  const columnMapping = {
+    year_id: "Year",
+    date_game: "Game Date",
+    is_playoffs: "Is Playoffs",
+    fran_id: "Team",
+    pts: "Points",
+    elo_i: "Elo Initial",
+    elo_n: "Elo New",
+    win_equiv: "Win Equiv",
+    opp_id: "Opponent ID",
+    opp_pts: "Opponent Points",
+    opp_elo_i: "Opponent Elo Initial",
+    opp_elo_n: "Opponent Elo New",
+    game_location: "Game Location",
+    game_result: "Game Result",
+    forecast: "Forecast",
+    total_pts: "Total Points",
+    pts_diff: "Points Difference",
+    avg_elo: "Average Elo",
+    elo_diff: "Elo Difference",
+  };
+
+  const renamedSearchResults = searchResults.map((row) => {
+    const renamedRow = {};
+    for (const key in row) {
+      if (columnMapping[key]) {
+        renamedRow[columnMapping[key]] =
+          typeof row[key] === "number"
+            ? roundToTwoDecimalPlaces(row[key])
+            : row[key];
+      }
+    }
+    return renamedRow;
+  });
+
+  const topUpsetsKeysToKeep = [
+    "year_id",
+    "date_game",
+    "is_playoffs",
+    "fran_id",
+    "pts",
+    "elo_i",
+    "elo_n",
+    "win_equiv",
+    "opp_id",
+    "opp_pts",
+    "opp_elo_i",
+    "opp_elo_n",
+    "game_location",
+    "game_result",
+    "forecast",
+  ];
+
+  const topUpsetsColumnMapping = {
+    year_id: "Year",
+    date_game: "Game Date",
+    is_playoffs: "Is Playoffs",
+    fran_id: "Franchise ID",
+    pts: "Points",
+    elo_i: "Elo Initial",
+    elo_n: "Elo New",
+    win_equiv: "Win Equiv",
+    opp_id: "Opponent ID",
+    opp_pts: "Opponent Points",
+    opp_elo_i: "Opponent Elo Initial",
+    opp_elo_n: "Opponent Elo New",
+    game_location: "Game Location",
+    game_result: "Game Result",
+    forecast: "Forecast",
+  };
+
+  const filterAndRenameTopUpsetsColumns = (data) => {
+    return data.map((row) => {
+      const newRow = {};
+      for (const key in row) {
+        if (topUpsetsKeysToKeep.includes(key) && topUpsetsColumnMapping[key]) {
+          newRow[topUpsetsColumnMapping[key]] =
+            typeof row[key] === "number"
+              ? roundToTwoDecimalPlaces(row[key])
+              : row[key];
+        }
+      }
+      return newRow;
+    });
+  };
+
+  const renamedTopUpsets = filterAndRenameTopUpsetsColumns(topUpsets);
 
   const filteredResults = searchResults.map((result) => {
     return Object.keys(result)
@@ -176,34 +263,22 @@ const Game = () => {
 
   return (
     <div>
-      <h1
-        style={{
-          fontSize: "3rem",
-          textAlign: "center",
-          margin: "2rem 0",
-          background: "linear-gradient(to right, #0074D9, #7FDBFF)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        Games
-      </h1>
+      <h1 style={h1Style}>Games</h1>
+      <SeasonSelect
+        onSeasonsChange={handleSeasonsChange}
+        value={seasons}
+        setValue={setSeasons}
+        style={selectStyle}
+        max={2015}
+      />
       <div
         style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
       >
-        <SeasonSelect
-          onSeasonsChange={handleSeasonsChange}
-          value={seasons}
-          setValue={setSeasons}
-          style={selectStyle}
-          max={2015}
-        />
         <select onChange={(e) => handleTeamChange(e, 1)} style={selectStyle}>
           <option value="">Select Team 1</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
               {team.team_id} - {team.fran_id}{" "}
-              {/* Display team ID alongside franchise ID */}
             </option>
           ))}
         </select>
@@ -212,15 +287,15 @@ const Game = () => {
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
               {team.team_id} - {team.fran_id}{" "}
-              {/* Display team ID alongside franchise ID */}
             </option>
           ))}
         </select>
 
         <select onChange={handleSortChange} style={selectStyle}>
           <option value="">Sort by</option>
-          {/* Add sort options here */}
           <option value="total_pts">Total Points</option>
+          <option value="avg_elo">Average Elo</option>
+          <option value="forecast">Forecast</option>
         </select>
 
         <select onChange={handleSortOrderChange} style={selectStyle}>
@@ -234,9 +309,17 @@ const Game = () => {
         </select>
       </div>
       <h1 style={h1Style}>Search Results</h1>
-      <LazyTable data={filteredResults} seasons={seasons} />
-      <h1 style={h1Style}>Top Upsets</h1>
-      <LazyTable data={topUpsets} seasons={seasons} />
+      <LazyTable
+        data={renamedSearchResults}
+        seasons={seasons}
+        roundToTwoDecimalPlaces={roundToTwoDecimalPlaces}
+      />
+      <h1 style={h1Style}>Top Upsets In {seasons}</h1>
+      <LazyTable
+        data={filterAndRenameTopUpsetsColumns(topUpsets)}
+        seasons={seasons}
+        roundToTwoDecimalPlaces={roundToTwoDecimalPlaces}
+      />
     </div>
   );
 };

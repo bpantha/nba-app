@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
 import Player from "./pages/Player";
 import Game from "./pages/Game";
+import Team from "./pages/Team";
+
 // import HomePage from "./pages/HomePage";
 // import AlbumsPage from "./pages/AlbumsPage";
 // import SongsPage from "./pages/SongsPage";
@@ -34,6 +36,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/player" element={<Player />} />
           <Route path="/games" element={<Game />} />
+          <Route path="/teams" element={<Team />} />
           {/* <Route path="/teams" element={<AlbumsPage />} /> */}
           {/* <Route path="/albums/:album_id" element={<AlbumInfoPage />} /> */}
           {/* <Route path="/songs" element={<SongsPage />} /> */}

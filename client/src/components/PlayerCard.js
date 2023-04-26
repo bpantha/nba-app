@@ -116,7 +116,7 @@ export function PlayerCard({ player }) {
                 justifyContent: "center",
               }}
             >
-              Carrer Averages
+              Career Averages
             </h3>
             <div
               style={{

@@ -35,6 +35,21 @@ const logos = {
   'WAS': NBAIcons.WAS,
 };
 
+const h1Style = {
+  fontSize: "3rem",
+  textAlign: "center",
+  margin: "2rem 0",
+  background: "linear-gradient(to right, #003459, #0074D9)", // Updated gradient colors
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  fontFamily: "monospace",
+  fontWeight: 700,
+  letterSpacing: ".3rem",
+  textTransform: "uppercase", // Added text transformation
+  paddingBottom: "0.3rem", // Added padding to the bottom
+  borderBottom: "4px solid #0074D9", // Added a solid bottom border
+};
+
 export function NbaTeamLogos ({ teams, seasons }) {
 
   const filteredTeams = teams.filter((team) => logos[team.team_id]);
@@ -43,17 +58,17 @@ export function NbaTeamLogos ({ teams, seasons }) {
     const seasonString = `Season: ${seasons}`;
 
     return (
-      <Container maxWidth="sm" sx={{ padding: 10 }}>
-        <Grid container spacing={2} component={Paper} sx={{ padding: 2 }}>
+      <Container maxWidth="100%" sx={{ padding: 10 }}>
+        <Grid container spacing={1} component={Paper} sx={{ padding: 2 }}>
           <Grid item xs={12}>
             <Typography variant="h6" align="center">
-              Teams
+              <h1 style={h1Style}>Teams</h1>
             </Typography>
           </Grid>
           {filteredTeams.map((team, index) => {
             const LogoComponent = logos[team.team_id];
             return (
-              <Grid item xs={12} sm={4} key={index} sx={{ padding: 2 }}>
+              <Grid item sm={2} key={index} sx={{ padding: 2 }}>
                 <Grid container alignItems="center" direction="column" spacing={1}>
                   <Grid item>
                     <Typography variant="subtitle1">{team.fran_id}</Typography>
@@ -76,6 +91,42 @@ export function NbaTeamLogos ({ teams, seasons }) {
         </Grid>
       </Container>
     );
+    
+
+    // return (
+    //   <Container maxWidth="100%" sx={{ padding: 10 }}>
+    //     <Grid container spacing={1} component={Paper} sx={{ padding: 2 }}>
+    //       <Grid item xs={12}>
+    //         <Typography variant="h6" align="center">
+    //           Teams
+    //         </Typography>
+    //       </Grid>
+    //       {filteredTeams.map((team, index) => {
+    //         const LogoComponent = logos[team.team_id];
+    //         return (
+    //           <Grid item xs={12} sm={4} key={index} sx={{ padding: 2 }}>
+    //             <Grid container alignItems="center" direction="column" spacing={1}>
+    //               <Grid item>
+    //                 <Typography variant="subtitle1">{team.fran_id}</Typography>
+    //               </Grid>
+    //               <Grid item>
+    //                 <Box
+    //                   sx={{
+    //                     display: "flex",
+    //                     justifyContent: "center",
+    //                     alignItems: "center",
+    //                   }}
+    //                 >
+    //                   {LogoComponent && <LogoComponent />}
+    //                 </Box>
+    //               </Grid>
+    //             </Grid>
+    //           </Grid>
+    //         );
+    //       })}
+    //     </Grid>
+    //   </Container>
+    // );
   }
 };
 

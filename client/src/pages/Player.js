@@ -45,6 +45,7 @@ const Player = () => {
     }, 50),
     [seasons]
   );
+  
   //useEffect with empty dependency array gets the API call to run initially
   useEffect(() => {
     const fetchData = async () => {
@@ -99,6 +100,21 @@ const Player = () => {
     ],
   };
 
+  const headerStyle = {
+    fontSize: "2rem",
+    textAlign: "center",
+    margin: "2rem 0",
+    background: "linear-gradient(to right, #003459, #0074D9)", 
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    fontFamily: "monospace",
+    fontWeight: 700,
+    letterSpacing: ".3rem",
+    textTransform: "uppercase", 
+    paddingBottom: "0.3rem", 
+    borderBottom: "4px solid #0074D9", 
+  };
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -114,14 +130,17 @@ const Player = () => {
   };
   return (
     <div>
+      <header style={headerStyle}>
+        <h1>Players</h1>
+      </header>
       <SeasonSelect
         onSeasonsChange={handleSeasonsChange}
         value={seasons}
         setValue={setSeasons}
       />
-      <h1 style={h1Style}>Award Winners in {seasons}</h1>
+      <h1 style={headerStyle}>Award Winners in {seasons}</h1>
       <LazyTable data={awardWinners} seasons={seasons} />
-      <h1 style={h1Style}>Best Players in {seasons}</h1>
+      <h1 style={headerStyle}>Best Players in {seasons}</h1>
       <LazyTable data={bestPlayers} seasons={seasons} />
     </div>
   );

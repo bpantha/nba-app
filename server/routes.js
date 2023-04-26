@@ -400,6 +400,7 @@ const award = async function (req, res) {
  ************************/
 
 // Route 7: GET /awards_by_team
+// Route 7: GET /awards_by_team
 const awards_by_team = async function (req, res) {
   const page = req.query.page;
 
@@ -408,27 +409,21 @@ const awards_by_team = async function (req, res) {
   if (!page) {
     connection.query(
       `SELECT
-    Teams.fran_id,
-    Seasons.season,
-    COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
-    COUNT(DISTINCT Games.game_id) AS total_wins,
-    AVG(Games.elo_n) AS average_ELO
-FROM
-    Seasons
-    JOIN Teams
-        ON Seasons.team = Teams.team_id
-    LEFT JOIN Awards
-        ON Seasons.player_id = Awards.player_id
-            AND Seasons.season = Awards.season
-    LEFT JOIN Games
-        ON Seasons.team = Games.team_id
-            AND Seasons.season = Games.year_id
-            AND Games.game_result = 'W'
-WHERE year_id <=2015
-GROUP BY
-    Teams.fran_id,
-    Seasons.season
-ORDER BY total_awards DESC;`,
+        Teams.fran_id,
+        Seasons.season,
+        COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
+        COUNT(DISTINCT Games.game_id) AS total_wins,
+        ROUND(AVG(Games.elo_n), 2) AS average_ELO
+      FROM
+        Seasons
+        JOIN Teams ON Seasons.team = Teams.team_id
+        LEFT JOIN Awards ON Seasons.player_id = Awards.player_id AND Seasons.season = Awards.season
+        LEFT JOIN Games ON Seasons.team = Games.team_id AND Seasons.season = Games.year_id AND Games.game_result = 'W'
+      WHERE year_id <= 2015
+      GROUP BY
+        Teams.fran_id,
+        Seasons.season
+      ORDER BY total_awards DESC;`,
       (err, data) => {
         if (err || data.length === 0) {
           console.log(err);
@@ -437,35 +432,29 @@ ORDER BY total_awards DESC;`,
           res.json(data);
         }
       }
-    ); // replace this with your implementation
+    );
   } else {
-    const offset = pageSize * (page - 1);
+    let offset = pageSize * (page - 1);
     if (page === 0) {
       offset = 0;
     }
     connection.query(
       `SELECT
-    Teams.fran_id,
-    Seasons.season,
-    COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
-    COUNT(DISTINCT Games.game_id) AS total_wins,
-    AVG(Games.elo_n) AS average_ELO
-FROM
-    Seasons
-    JOIN Teams
-        ON Seasons.team = Teams.team_id
-    LEFT JOIN Awards
-        ON Seasons.player_id = Awards.player_id
-            AND Seasons.season = Awards.season
-    LEFT JOIN Games
-        ON Seasons.team = Games.team_id
-            AND Seasons.season = Games.year_id
-            AND Games.game_result = 'W'
-WHERE year_id <=2015
-GROUP BY
-    Teams.fran_id,
-    Seasons.season
-ORDER BY total_awards DESC;
+        Teams.fran_id,
+        Seasons.season,
+        COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
+        COUNT(DISTINCT Games.game_id) AS total_wins,
+        ROUND(AVG(Games.elo_n), 2) AS average_ELO
+      FROM
+        Seasons
+        JOIN Teams ON Seasons.team = Teams.team_id
+        LEFT JOIN Awards ON Seasons.player_id = Awards.player_id AND Seasons.season = Awards.season
+        LEFT JOIN Games ON Seasons.team = Games.team_id AND Seasons.season = Games.year_id AND Games.game_result = 'W'
+      WHERE year_id <= 2015
+      GROUP BY
+        Teams.fran_id,
+        Seasons.season
+      ORDER BY total_awards DESC
       LIMIT ${pageSize} OFFSET ${offset}`,
       (err, data) => {
         if (err || data.length === 0) {
@@ -475,9 +464,87 @@ ORDER BY total_awards DESC;
           res.json(data);
         }
       }
-    ); // replace this with your implementation
+    );
   }
 };
+// const awards_by_team = async function (req, res) {
+//   const page = req.query.page;
+
+//   const pageSize = req.query.page_size ?? 10;
+
+//   if (!page) {
+//     connection.query(
+//       `SELECT
+//     Teams.fran_id,
+//     Seasons.season,
+//     COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
+//     COUNT(DISTINCT Games.game_id) AS total_wins,
+//     AVG(Games.elo_n) AS average_ELO
+// FROM
+//     Seasons
+//     JOIN Teams
+//         ON Seasons.team = Teams.team_id
+//     LEFT JOIN Awards
+//         ON Seasons.player_id = Awards.player_id
+//             AND Seasons.season = Awards.season
+//     LEFT JOIN Games
+//         ON Seasons.team = Games.team_id
+//             AND Seasons.season = Games.year_id
+//             AND Games.game_result = 'W'
+// WHERE year_id <=2015
+// GROUP BY
+//     Teams.fran_id,
+//     Seasons.season
+// ORDER BY total_awards DESC;`,
+//       (err, data) => {
+//         if (err || data.length === 0) {
+//           console.log(err);
+//           res.json({});
+//         } else {
+//           res.json(data);
+//         }
+//       }
+//     ); // replace this with your implementation
+//   } else {
+//     const offset = pageSize * (page - 1);
+//     if (page === 0) {
+//       offset = 0;
+//     }
+//     connection.query(
+//       `SELECT
+//     Teams.fran_id,
+//     Seasons.season,
+//     COUNT(DISTINCT Awards.player_id, Awards.award) AS total_awards,
+//     COUNT(DISTINCT Games.game_id) AS total_wins,
+//     AVG(Games.elo_n) AS average_ELO
+// FROM
+//     Seasons
+//     JOIN Teams
+//         ON Seasons.team = Teams.team_id
+//     LEFT JOIN Awards
+//         ON Seasons.player_id = Awards.player_id
+//             AND Seasons.season = Awards.season
+//     LEFT JOIN Games
+//         ON Seasons.team = Games.team_id
+//             AND Seasons.season = Games.year_id
+//             AND Games.game_result = 'W'
+// WHERE year_id <=2015
+// GROUP BY
+//     Teams.fran_id,
+//     Seasons.season
+// ORDER BY total_awards DESC;
+//       LIMIT ${pageSize} OFFSET ${offset}`,
+//       (err, data) => {
+//         if (err || data.length === 0) {
+//           console.log(err);
+//           res.json({});
+//         } else {
+//           res.json(data);
+//         }
+//       }
+//     ); // replace this with your implementation
+//   }
+// };
 
 // Route 8: GET /best_seasons_bad_teams
 const best_seasons_bad_teams = async function (req, res) {
