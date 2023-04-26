@@ -126,7 +126,6 @@ export function TeamCard({ team, seasons, setSeasons, open, onClose }) {
           .then((resJson) => setTeamRoster(resJson));
       };
       fetchData();
-      console.log(teamRoster);
     }, 50),
     [team]
   );
@@ -138,7 +137,6 @@ export function TeamCard({ team, seasons, setSeasons, open, onClose }) {
   }, [team, open, seasons, handleFetchTeamRoster]);
 
   const handleSeasonsChange = (newSelectedSeason) => {
-    console.log(newSelectedSeason);
     setSeasons(newSelectedSeason);
     handleFetchTeamRoster(team, newSelectedSeason);
   };

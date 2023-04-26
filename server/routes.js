@@ -124,18 +124,6 @@ const player_stats = async function (req, res) {
       res.json(data);
     }
   });
-  // connection.query(`;
-  // // SELECT *
-  // // FROM Seasons s
-  // // WHERE s.player_id = '${player_id}'
-  // // ORDER BY s.season ASC`, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data);
-  //   }
-  // }); // replace this with your implementation
 };
 
 // Route 6: GET /roster
