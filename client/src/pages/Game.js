@@ -23,6 +23,19 @@ const Game = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [topUpsets, setTopUpsets] = useState([]);
   const [gameOutcome, setGameOutcome] = useState("ALL");
+  const [canSearch, setCanSearch] = useState(false);
+
+  useEffect(() => {
+    if (team1 && team2 && sort) {
+      setCanSearch(true);
+    } else {
+      setCanSearch(false);
+    }
+  }, [team1, team2, sort]);
+
+  const handleSearchClick = () => {
+    fetchData();
+  };
 
   const handleSeasonsChange = useCallback(
     debounce((newSelectedSeason) => {
@@ -63,24 +76,47 @@ const Game = () => {
     fetchData();
   }, [seasons]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (team1 && team2 && sort) {
-        if (team1 === team2) {
-          setSearchResults([]);
-        } else {
-          fetch(
-            `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
-          )
-            .then((res) => res.json())
-            .then((resJson) => setSearchResults(resJson));
-        }
-      } else {
+  const fetchData = async () => {
+    if (team1 && team2 && sort) {
+      if (team1 === team2) {
         setSearchResults([]);
+      } else {
+        fetch(
+          `http://${config.server_host}:${config.server_port}/search_games/${seasons}/${team1}/${team2}/${gameOutcome}/${sort}/${sortOrder}`
+        )
+          .then((res) => res.json())
+          .then((resJson) => setSearchResults(resJson));
       }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const getSelectStyle = (value) => {
+    const baseStyle = {
+      margin: "0.5rem",
+      padding: "0.5rem",
+      borderRadius: "4px",
+      fontSize: "1rem",
+      fontFamily: "monospace",
     };
-    fetchData();
-  }, [seasons, team1, team2, gameOutcome, sort, sortOrder]);
+  
+    if (value) {
+      return {
+        ...baseStyle,
+        border: "1px solid #2E4A62",
+        backgroundColor: "#f0f8ff",
+      };
+    } else {
+      return {
+        ...baseStyle,
+        border: "1px solid #ff4d4d",
+        backgroundColor: "#ffe6e6",
+      };
+    }
+  };
+  
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -275,7 +311,7 @@ const Game = () => {
       <div
         style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
       >
-        <select onChange={(e) => handleTeamChange(e, 1)} style={selectStyle}>
+        <select onChange={(e) => handleTeamChange(e, 1)} style={getSelectStyle(team1)}>
           <option value="">Select Team 1</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
@@ -283,7 +319,7 @@ const Game = () => {
             </option>
           ))}
         </select>
-        <select onChange={(e) => handleTeamChange(e, 2)} style={selectStyle}>
+        <select onChange={(e) => handleTeamChange(e, 2)} style={getSelectStyle(team2)}>
           <option value="">Select Team 2</option>
           {teams.map((team) => (
             <option key={team.team_id} value={team.team_id}>
@@ -292,7 +328,7 @@ const Game = () => {
           ))}
         </select>
 
-        <select onChange={handleSortChange} style={selectStyle}>
+        <select onChange={handleSortChange} style={getSelectStyle(sort)}>
           <option value="">Sort by</option>
           <option value="total_pts">Total Points</option>
           <option value="avg_elo">Average Elo</option>
@@ -308,6 +344,19 @@ const Game = () => {
           <option value="W">Wins</option>
           <option value="L">Losses</option>
         </select>
+        <button
+        onClick={handleSearchClick}
+        disabled={!canSearch}
+        style={{
+          ...selectStyle,
+          cursor: canSearch ? 'pointer' : 'not-allowed',
+          backgroundColor: canSearch ? '#0074D9' : '#9aa3ac',
+          color: 'white',
+          fontWeight: 'bold',
+        }}
+      >
+        Search
+      </button>
       </div>
       <h1 style={h1Style}>Search Results</h1>
       <LazyTable
