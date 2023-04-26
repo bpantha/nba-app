@@ -147,9 +147,7 @@ const roster = async function (req, res) {
     allSeasonsToggle = true;
   }
 
-  const seasonsCondition = allSeasonsToggle
-    ? "TRUE"
-    : seasonsParam
+  const seasonsCondition = seasonsParam
     ? `s.season = ${seasonsParam}`
     : `s.season = (SELECT MAX(season) FROM Seasons)`;
 
@@ -165,7 +163,7 @@ const roster = async function (req, res) {
     FROM Seasons s 
     WHERE s.team = '${team}' AND ${seasonsCondition} AND s.season_type = 'RS'),
     Career AS (SELECT p.player_id, SUM(r.gp) as gp, SUM(r.mp) as mp, AVG(r.pts) as pts, AVG(r.reb) as reb, AVG(r.ast) as ast
-    FROM Players p NATURAL JOIN Roster r
+    FROM Players p INNER JOIN Roster r ON p.player_id = r.player_id
     GROUP BY p.player_id)
     SELECT DISTINCT p.player_name, c.gp, c.mp, c.pts, c.reb, c.ast, p.player_height, p.player_weight, p.country, p.college
     FROM Career c JOIN Players p on c.player_id = p.player_id
